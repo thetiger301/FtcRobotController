@@ -6,9 +6,10 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 @TeleOp(name="Main OpMode")
 public class MainOpMode extends LinearOpMode {
 
+    // System Declarations
+
     @Override
     public void runOpMode() {
-        // Device Declarations
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
@@ -17,7 +18,9 @@ public class MainOpMode extends LinearOpMode {
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
+
             // Competition Program
+
             telemetry.addData("Status", "Running");
             telemetry.update();
         }
