@@ -8,14 +8,13 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class Drivetrain {
     private DcMotor frontLeft, frontRight, backLeft, backRight;
-    private Telemetry telemetry;
+    private Telemetry telemetry = null;
     public Drivetrain(HardwareMap hardwareMap, Telemetry telemetry) {
         // Initialize motors with the same names from configuration
         frontLeft = hardwareMap.get(DcMotor.class, "front-left-drive");
         backLeft = hardwareMap.get(DcMotor.class, "back-left-drive");
         frontRight = hardwareMap.get(DcMotor.class, "front-right-drive");
         backRight = hardwareMap.get(DcMotor.class, "back-right-drive");
-        this.telemetry = telemetry;
 
         // Set directions (same as in your current OpMode)
         frontLeft.setDirection(DcMotor.Direction.REVERSE);
