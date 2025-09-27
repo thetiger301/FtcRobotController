@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 public class MainOpMode extends LinearOpMode {
 
     // System Declarations
-    private Drivetrain drivetrain = null;
+    private Drivetrain drivetrain;
 
     @Override
     public void runOpMode() {

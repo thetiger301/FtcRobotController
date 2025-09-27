@@ -8,8 +8,9 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class Drivetrain {
     private DcMotor frontLeft, frontRight, backLeft, backRight;
-    private Telemetry telemetry = null;
+    private Telemetry telemetry;
     public Drivetrain(HardwareMap hardwareMap, Telemetry telemetry) {
+        this.telemetry = telemetry;
         // Initialize motors with the same names from configuration
         frontLeft = hardwareMap.get(DcMotor.class, "front-left-drive");
         backLeft = hardwareMap.get(DcMotor.class, "back-left-drive");
