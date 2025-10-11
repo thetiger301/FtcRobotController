@@ -7,11 +7,14 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 public class MainOpMode extends LinearOpMode {
 
     // System Declarations
-    private Drivetrain drivetrain;
+    public Drivetrain drivetrain;
+    public boolean fieldOriented;
+    public double axial, lateral, yaw;
+
 
     @Override
     public void runOpMode() {
-        drivetrain = new Drivetrain(hardwareMap, telemetry);
+        drivetrain = new Drivetrain(hardwareMap, telemetry, gamepad1);
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -22,11 +25,22 @@ public class MainOpMode extends LinearOpMode {
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             // Competition Program
-            double axial   = -gamepad1.left_stick_y; // forward/back
-            double lateral =  gamepad1.left_stick_x; // strafe
-            double yaw     =  gamepad1.right_stick_x; // rotate
+            axial = -gamepad1.left_stick_y; // Remember, Y stick value is reversed
+            lateral = gamepad1.left_stick_x;
+            yaw = gamepad1.right_stick_x;
+            if (gamepad1.a) {
+                fieldOriented = true;
+            } else if (gamepad1.b){
+                fieldOriented = false;
+            }
 
-            drivetrain.drive(axial, lateral, yaw);
+            if (fieldOriented) {
+                drivetrain.fieldOrientedDrive(axial, lateral, yaw);
+            } else if (!fieldOriented) {
+                drivetrain.drive(axial, lateral, yaw);
+            }
+
+            drivetrain.resetIMU();
 
             telemetry.addData("Status", "Running");
             telemetry.addData("Inputs", "axial: %.2f, lateral: %.2f, yaw: %.2f", axial, lateral, yaw);
