@@ -25,7 +25,7 @@ public class Drivetrain {
         backRight = hardwareMap.get(DcMotor.class, "back-right-drive");
 
         // Set directions (same as in your current OpMode)
-        frontLeft.setDirection(com.qualcomm.robotcore.hardware.DcMotor.Direction.REVERSE);
+        frontLeft.setDirection(DcMotor.Direction.REVERSE);
         backLeft.setDirection(DcMotor.Direction.FORWARD);
         frontRight.setDirection(DcMotor.Direction.FORWARD);
         backRight.setDirection(DcMotor.Direction.FORWARD);
@@ -99,9 +99,10 @@ public class Drivetrain {
 
         telemetry.addData("Front left/Right", "%4.2f, %4.2f", frontLeftPower, frontRightPower);
         telemetry.addData("Back  left/Right", "%4.2f, %4.2f", backLeftPower, backRightPower);
+        telemetry.addData("Heading", botHeading);
     }
     public void resetIMU() {
-        if (gamepad1.options) {
+        if (gamepad1.dpad_up) {
             imu.resetYaw();
         }
     }

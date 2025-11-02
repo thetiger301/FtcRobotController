@@ -25,6 +25,9 @@ public class MainOpMode extends LinearOpMode {
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             // Competition Program
+
+            telemetry.addData("Status", "Running");
+            telemetry.addData("Inputs", "axial: %.2f, lateral: %.2f, yaw: %.2f", axial, lateral, yaw);
             axial = -gamepad1.left_stick_y; // Remember, Y stick value is reversed
             lateral = gamepad1.left_stick_x;
             yaw = gamepad1.right_stick_x;
@@ -42,8 +45,6 @@ public class MainOpMode extends LinearOpMode {
 
             drivetrain.resetIMU();
 
-            telemetry.addData("Status", "Running");
-            telemetry.addData("Inputs", "axial: %.2f, lateral: %.2f, yaw: %.2f", axial, lateral, yaw);
             telemetry.update();
         }
     }
