@@ -8,6 +8,7 @@ public class MainOpMode extends LinearOpMode {
 
     // System Declarations
     public Drivetrain drivetrain;
+    public Intake intake;
     public boolean fieldOriented;
     public double axial, lateral, yaw;
 
@@ -15,6 +16,7 @@ public class MainOpMode extends LinearOpMode {
     @Override
     public void runOpMode() {
         drivetrain = new Drivetrain(hardwareMap, telemetry, gamepad1);
+        intake = new Intake(hardwareMap, gamepad1);
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -44,6 +46,7 @@ public class MainOpMode extends LinearOpMode {
             }
 
             drivetrain.resetIMU();
+            intake.intakeIn();
 
             telemetry.update();
         }
