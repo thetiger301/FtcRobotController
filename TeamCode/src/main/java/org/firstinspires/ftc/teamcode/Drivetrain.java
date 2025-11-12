@@ -102,8 +102,6 @@ public class Drivetrain {
         telemetry.addData("Heading", botHeading);
     }
     public void resetIMU() {
-        if (gamepad1.dpad_up) {
-            imu.resetYaw();
-        }
+        imu.resetYaw();
     }
 }

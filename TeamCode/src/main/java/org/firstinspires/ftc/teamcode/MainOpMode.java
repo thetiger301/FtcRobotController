@@ -42,8 +42,9 @@ public class MainOpMode extends LinearOpMode {
             } else if (!fieldOriented) {
                 drivetrain.drive(axial, lateral, yaw);
             }
-
-            drivetrain.resetIMU();
+            if (gamepad1.dpad_up) {
+                drivetrain.resetIMU();
+            }
 
             telemetry.update();
         }
