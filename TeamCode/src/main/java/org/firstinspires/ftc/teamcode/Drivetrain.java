@@ -61,6 +61,8 @@ public class Drivetrain {
         backLeft.setPower(backLeftPower);
         backRight.setPower(backRightPower);
 
+
+
         telemetry.addData("Front left/Right", "%4.2f, %4.2f", frontLeftPower, frontRightPower);
         telemetry.addData("Back  left/Right", "%4.2f, %4.2f", backLeftPower, backRightPower);
     }
@@ -97,9 +99,171 @@ public class Drivetrain {
         backLeft.setPower(backLeftPower);
         backRight.setPower(backRightPower);
 
+
+
         telemetry.addData("Front left/Right", "%4.2f, %4.2f", frontLeftPower, frontRightPower);
         telemetry.addData("Back  left/Right", "%4.2f, %4.2f", backLeftPower, backRightPower);
     }
+
+    //for autonomous
+    public void driveForwardDistance(double inches, double power) {
+        int ticksPerRev = 537; // GoBILDA 312 RPM motor; adjust for yours
+        double wheelDiameter = 3.779; // in inches (96mm GoBILDA wheels)
+        double ticksPerInch = ticksPerRev / (wheelDiameter * Math.PI);
+
+        int targetTicks = (int) (inches * ticksPerInch);
+
+        // Reset encoders
+        frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        // Set target position
+        frontLeft.setTargetPosition(targetTicks);
+        frontRight.setTargetPosition(targetTicks);
+        backLeft.setTargetPosition(targetTicks);
+        backRight.setTargetPosition(targetTicks);
+
+        // Set to RUN_TO_POSITION mode
+        frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        frontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        backLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        backRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        // Set motor power
+        frontLeft.setPower(power);
+        frontRight.setPower(power);
+        backLeft.setPower(power);
+        backRight.setPower(power);
+
+        // Wait until all motors are done
+        while (frontLeft.isBusy() && frontRight.isBusy() &&
+                backLeft.isBusy() && backRight.isBusy()) {
+            // You can add telemetry here to show progress
+        }
+
+        // Stop all motion
+        frontLeft.setPower(0);
+        frontRight.setPower(0);
+        backLeft.setPower(0);
+        backRight.setPower(0);
+
+        // Return to encoder mode
+        frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+
+    public void turnDegrees(double degrees, double power) {
+        // How many ticks your robot turns per degree
+        double ticksPerDegree = 13.5;  // 🔧 This value must be tuned for your robot!
+
+        int targetTicks = (int)(degrees * ticksPerDegree);
+
+        // Reset encoders
+        frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        // Left wheels go backward, right wheels go forward
+        frontLeft.setTargetPosition(targetTicks);
+        backLeft.setTargetPosition(targetTicks);
+        frontRight.setTargetPosition(-targetTicks);
+        backRight.setTargetPosition(-targetTicks);
+
+        // RUN_TO_POSITION mode
+        frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        frontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        backLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        backRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        // Set power
+        frontLeft.setPower(power);
+        frontRight.setPower(power);
+        backLeft.setPower(power);
+        backRight.setPower(power);
+
+        // Wait until turn completes
+        while (frontLeft.isBusy() && frontRight.isBusy() &&
+                backLeft.isBusy() && backRight.isBusy()) {
+            // optional: telemetry during turn
+        }
+
+        // Stop and reset to normal mode
+        stop();
+        frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+
+    public void strafeDistance(double inches, double power) {
+        int ticksPerRev = 537; // adjust for your motor
+        double wheelDiameter = 3.779; // inches
+        double ticksPerInch = ticksPerRev / (wheelDiameter * Math.PI);
+
+        int targetTicks = (int)(inches * ticksPerInch);
+
+        // Reset encoders
+        frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        // Mecanum strafe: each wheel moves in a different direction
+        frontLeft.setTargetPosition(targetTicks);
+        backLeft.setTargetPosition(-targetTicks);
+        frontRight.setTargetPosition(-targetTicks);
+        backRight.setTargetPosition(targetTicks);
+
+        // RUN_TO_POSITION mode
+        frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        frontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        backLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        backRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        // Set power
+        frontLeft.setPower(power);
+        frontRight.setPower(power);
+        backLeft.setPower(power);
+        backRight.setPower(power);
+
+        // Wait for completion
+        while (frontLeft.isBusy() && frontRight.isBusy() &&
+                backLeft.isBusy() && backRight.isBusy()) {
+            // optional telemetry
+        }
+
+        stop();
+
+        // Return to normal mode
+        frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+
+
+    //for autonomous
+    public void forward(double power){
+        drive(power,0,0);
+    }
+
+    public void strafe(double power){
+        drive(0,power,0);
+    }
+
+    public void turn(double power){
+        drive(0,0,power);
+    }
+
+    public void stop() {
+        drive(0, 0, 0);
+    }
+
     public void resetIMU() {
         if (gamepad1.options) {
             imu.resetYaw();
