@@ -16,7 +16,7 @@ public class Shooter {
 
     }
     public void runShooter() {
-        double shooterPower = 0.5;
+        double shooterPower = -1;
         shooter.setPower(shooterPower);
         telemetry.addData("Shooter Power", shooterPower);
     }

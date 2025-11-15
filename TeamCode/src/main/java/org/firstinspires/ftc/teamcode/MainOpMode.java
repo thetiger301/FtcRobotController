@@ -45,12 +45,11 @@ public class MainOpMode extends LinearOpMode {
                 drivetrain.drive(axial, lateral, yaw);
             }
             if (gamepad1.x) {
-
+                shooter.runShooter();
             }
             if (gamepad1.dpad_up) {
                 drivetrain.resetIMU();
             }
-
             telemetry.update();
         }
     }
