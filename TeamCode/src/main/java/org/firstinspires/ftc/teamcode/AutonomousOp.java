@@ -30,16 +30,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
                     drivetrain.driveForwardDistance(12, 0.5);
                     sleep(500);
 
-                    // Turn 90 degrees right
-                    drivetrain.turnDegrees(90, 0.4);
-                    sleep(500);
 
-                    // Strafe right 12 inches
-                    drivetrain.strafeDistance(12, 0.5);
-                    sleep(500);
-
-                    // Move backward 12 inches
-                    drivetrain.driveForwardDistance(-12, 0.5);
 
 
                     telemetry.addLine("Autonomous running...");
