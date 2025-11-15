@@ -18,30 +18,33 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 
             telemetry.addLine("Initialized");
+            telemetry.addData("Heading", drivetrain.getHeading());
             telemetry.update();
 
             // Wait for the start button
             waitForStart();
+            drivetrain.imu.resetYaw();
 
-            if (opModeIsActive()) {
 
                 if (opModeIsActive()) {
-                    // Move forward 12 inches
-                    drivetrain.driveForwardDistance(12, 0.5);
-                    sleep(500);
-
-
-
 
                     telemetry.addLine("Autonomous running...");
                     telemetry.update();
-                    sleep(2000);
+
+                    // Move forward 12 inches
+                    drivetrain.driveForwardDistance(12, 0.5);
+                    sleep(1000);
+
+
+                    drivetrain.turnToAngle(90,0.5);
+
+
                     telemetry.addLine("Autonomous done!");
                     telemetry.update();
 
 
                 }
-            }
+
 
         }
 

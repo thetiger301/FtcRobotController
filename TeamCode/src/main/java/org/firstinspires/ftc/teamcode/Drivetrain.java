@@ -5,7 +5,6 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
-
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
@@ -24,6 +23,12 @@ public class Drivetrain {
         frontRight = hardwareMap.get(DcMotor.class, "front-right-drive");
         backRight = hardwareMap.get(DcMotor.class, "back-right-drive");
 
+        //put the motors in break mode
+        frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
         // Set directions (same as in your current OpMode)
         frontLeft.setDirection(com.qualcomm.robotcore.hardware.DcMotor.Direction.REVERSE);
         backLeft.setDirection(DcMotor.Direction.FORWARD);
@@ -32,7 +37,12 @@ public class Drivetrain {
         imu = hardwareMap.get(IMU.class, "imu");
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
                 RevHubOrientationOnRobot.LogoFacingDirection.UP,
-                RevHubOrientationOnRobot.UsbFacingDirection.FORWARD));
+                RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD));
+        imu.initialize(parameters);
+    }
+
+    public double getHeading() {
+        return imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
     }
 
     public void drive(double axial, double lateral, double yaw) {
@@ -73,8 +83,8 @@ public class Drivetrain {
         double botHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
 
         // Rotate the movement direction counter to the bot's rotation
-        double rotX = axial * Math.cos(botHeading) - lateral * Math.sin(botHeading);
-        double rotY = axial * Math.sin(botHeading) + lateral * Math.cos(botHeading);
+        double rotX = lateral * Math.cos(botHeading) - axial * Math.sin(botHeading);
+        double rotY = lateral * Math.sin(botHeading) + axial * Math.cos(botHeading);
 
         double frontLeftPower  = rotX + rotY + yaw;
         double frontRightPower = rotX - rotY - yaw;
@@ -156,49 +166,28 @@ public class Drivetrain {
         backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
-    public void turnDegrees(double degrees, double power) {
-        // How many ticks your robot turns per degree
-        double ticksPerDegree = 13.5;  // 🔧 This value must be tuned for your robot!
+    public void turnToAngle(double targetAngle, double power) {
 
-        int targetTicks = (int)(degrees * ticksPerDegree);
+        double error = targetAngle - getHeading();
 
-        // Reset encoders
-        frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        while (Math.abs(error) > 1) {   // stop when within ±1 degree
+            double turnPower = error * 0.015; // slow down as you get close
+            turnPower = Math.max(-power, Math.min(power, turnPower));
 
-        // Left wheels go backward, right wheels go forward
-        frontLeft.setTargetPosition(targetTicks);
-        backLeft.setTargetPosition(targetTicks);
-        frontRight.setTargetPosition(-targetTicks);
-        backRight.setTargetPosition(-targetTicks);
+            // turn robot
+            frontLeft.setPower(-turnPower);
+            backLeft.setPower(-turnPower);
+            frontRight.setPower(turnPower);
+            backRight.setPower(turnPower);
 
-        // RUN_TO_POSITION mode
-        frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        frontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        backLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        backRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-        // Set power
-        frontLeft.setPower(power);
-        frontRight.setPower(power);
-        backLeft.setPower(power);
-        backRight.setPower(power);
-
-        // Wait until turn completes
-        while (frontLeft.isBusy() && frontRight.isBusy() &&
-                backLeft.isBusy() && backRight.isBusy()) {
-            // optional: telemetry during turn
+            // recalc error
+            error = targetAngle - getHeading();
         }
 
-        // Stop and reset to normal mode
         stop();
-        frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
+
+
 
     public void strafeDistance(double inches, double power) {
         int ticksPerRev = 537; // adjust for your motor

@@ -21,6 +21,7 @@ public class MainOpMode extends LinearOpMode {
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
+        drivetrain.imu.resetYaw();
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
@@ -28,9 +29,11 @@ public class MainOpMode extends LinearOpMode {
             axial = -gamepad1.left_stick_y; // Remember, Y stick value is reversed
             lateral = gamepad1.left_stick_x;
             yaw = gamepad1.right_stick_x;
-            if (gamepad1.a) {
+
+            if (gamepad1.aWasPressed() && !fieldOriented) {
                 fieldOriented = true;
-            } else if (gamepad1.b){
+            }
+            else if (gamepad1.aWasPressed() && fieldOriented){
                 fieldOriented = false;
             }
 
@@ -40,10 +43,10 @@ public class MainOpMode extends LinearOpMode {
                 drivetrain.drive(axial, lateral, yaw);
             }
 
-            drivetrain.resetIMU();
 
             telemetry.addData("Status", "Running");
             telemetry.addData("Inputs", "axial: %.2f, lateral: %.2f, yaw: %.2f", axial, lateral, yaw);
+            telemetry.addData("Heading", drivetrain.getHeading());
             telemetry.update();
         }
     }
