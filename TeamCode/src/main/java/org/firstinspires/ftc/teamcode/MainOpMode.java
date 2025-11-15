@@ -8,6 +8,7 @@ public class MainOpMode extends LinearOpMode {
 
     // System Declarations
     public Drivetrain drivetrain;
+    public Shooter shooter;
     public boolean fieldOriented;
     public double axial, lateral, yaw;
 
@@ -15,6 +16,7 @@ public class MainOpMode extends LinearOpMode {
     @Override
     public void runOpMode() {
         drivetrain = new Drivetrain(hardwareMap, telemetry, gamepad1);
+        shooter = new Shooter(hardwareMap, telemetry);
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -41,6 +43,9 @@ public class MainOpMode extends LinearOpMode {
                 drivetrain.fieldOrientedDrive(axial, lateral, yaw);
             } else if (!fieldOriented) {
                 drivetrain.drive(axial, lateral, yaw);
+            }
+            if (gamepad1.x) {
+
             }
             if (gamepad1.dpad_up) {
                 drivetrain.resetIMU();
