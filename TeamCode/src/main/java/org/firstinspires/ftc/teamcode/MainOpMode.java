@@ -43,6 +43,10 @@ public class MainOpMode extends LinearOpMode {
                 drivetrain.drive(axial, lateral, yaw);
             }
 
+            if(gamepad1.dpadUpWasPressed()){
+                drivetrain.resetIMU();
+            }
+
 
             telemetry.addData("Status", "Running");
             telemetry.addData("Inputs", "axial: %.2f, lateral: %.2f, yaw: %.2f", axial, lateral, yaw);
