@@ -32,15 +32,19 @@ public class MainOpMode extends LinearOpMode {
 
             if (gamepad1.aWasPressed() && !fieldOriented) {
                 fieldOriented = true;
+
             }
-            else if (gamepad1.aWasPressed() && fieldOriented){
+            else if (gamepad1.bWasPressed() && fieldOriented){
                 fieldOriented = false;
             }
 
             if (fieldOriented) {
                 drivetrain.fieldOrientedDrive(axial, lateral, yaw);
+                telemetry.addData("Field Oriented Enabled", true);
+
             } else if (!fieldOriented) {
                 drivetrain.drive(axial, lateral, yaw);
+                telemetry.addData("Field Oriented Enabled", false);
             }
 
             if(gamepad1.dpadUpWasPressed()){

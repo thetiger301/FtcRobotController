@@ -83,8 +83,8 @@ public class Drivetrain {
         double botHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
 
         // Rotate the movement direction counter to the bot's rotation
-        double rotX = lateral * Math.cos(botHeading) - axial * Math.sin(botHeading);
-        double rotY = lateral * Math.sin(botHeading) + axial * Math.cos(botHeading);
+        double rotX = axial * Math.cos(botHeading) - lateral * Math.sin(botHeading);
+        double rotY = axial * Math.sin(botHeading) + lateral * Math.cos(botHeading);
 
         double frontLeftPower  = rotX + rotY + yaw;
         double frontRightPower = rotX - rotY - yaw;
