@@ -9,15 +9,19 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class Shooter {
     private DcMotor shooter;
     private Telemetry telemetry;
+    public int shooterVelocity;
     public Shooter(HardwareMap hardwareMap, Telemetry telemetry) {
         this.telemetry = telemetry;
         shooter = hardwareMap.get(DcMotor.class, "shooter");
         shooter.setDirection(DcMotorSimple.Direction.FORWARD);
-
     }
     public void runShooter() {
-        double shooterPower = -1;
-        shooter.setPower(shooterPower);
-        telemetry.addData("Shooter Power", shooterPower);
+        shooter.setPower(0.75);
+        telemetry.addData("Shooter Velocity", shooter.getPower());
+    }
+
+    public void stopShooter() {
+        shooter.setPower(0);
+        telemetry.addData("Shooter Velocity", shooter.getPower());
     }
 }

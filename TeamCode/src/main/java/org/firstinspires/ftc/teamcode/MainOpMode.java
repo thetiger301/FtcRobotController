@@ -46,6 +46,8 @@ public class MainOpMode extends LinearOpMode {
             }
             if (gamepad1.x) {
                 shooter.runShooter();
+            } else {
+                shooter.stopShooter();
             }
             if (gamepad1.dpad_up) {
                 drivetrain.resetIMU();
