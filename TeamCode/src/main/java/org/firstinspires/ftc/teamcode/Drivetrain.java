@@ -115,6 +115,11 @@ public class Drivetrain {
         telemetry.addData("Back  left/Right", "%4.2f, %4.2f", backLeftPower, backRightPower);
     }
 
+    // reset heading
+    public void resetIMU() {
+        imu.resetYaw();
+    }
+
     //for autonomous
     public void driveForwardDistance(double inches, double power) {
         int ticksPerRev = 537; // GoBILDA 312 RPM motor; adjust for yours
@@ -187,8 +192,6 @@ public class Drivetrain {
         stop();
     }
 
-
-
     public void strafeDistance(double inches, double power) {
         int ticksPerRev = 537; // adjust for your motor
         double wheelDiameter = 3.779; // inches
@@ -235,7 +238,6 @@ public class Drivetrain {
         backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
-
     //for autonomous
     public void forward(double power){
         drive(power,0,0);
@@ -251,11 +253,5 @@ public class Drivetrain {
 
     public void stop() {
         drive(0, 0, 0);
-    }
-
-    public void resetIMU() {
-        if (gamepad1.options) {
-            imu.resetYaw();
-        }
     }
 }
