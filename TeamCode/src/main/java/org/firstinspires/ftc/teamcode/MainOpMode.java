@@ -21,31 +21,40 @@ public class MainOpMode extends LinearOpMode {
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
+        drivetrain.imu.resetYaw();
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             // Competition Program
-
-            telemetry.addData("Status", "Running");
-            telemetry.addData("Inputs", "axial: %.2f, lateral: %.2f, yaw: %.2f", axial, lateral, yaw);
             axial = -gamepad1.left_stick_y; // Remember, Y stick value is reversed
             lateral = gamepad1.left_stick_x;
             yaw = gamepad1.right_stick_x;
-            if (gamepad1.a) {
+
+            if (gamepad1.aWasPressed() && !fieldOriented) {
                 fieldOriented = true;
-            } else if (gamepad1.b){
+
+            }
+            else if (gamepad1.bWasPressed() && fieldOriented){
                 fieldOriented = false;
             }
 
             if (fieldOriented) {
                 drivetrain.fieldOrientedDrive(axial, lateral, yaw);
+                telemetry.addData("Field Oriented Enabled", true);
+
             } else if (!fieldOriented) {
                 drivetrain.drive(axial, lateral, yaw);
+                telemetry.addData("Field Oriented Enabled", false);
             }
-            if (gamepad1.dpad_up) {
+
+            if(gamepad1.dpadUpWasPressed()){
                 drivetrain.resetIMU();
             }
 
+
+            telemetry.addData("Status", "Running");
+            telemetry.addData("Inputs", "axial: %.2f, lateral: %.2f, yaw: %.2f", axial, lateral, yaw);
+            telemetry.addData("Heading", drivetrain.getHeading());
             telemetry.update();
         }
     }
