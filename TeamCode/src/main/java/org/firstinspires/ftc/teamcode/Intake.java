@@ -17,8 +17,12 @@ public class Intake {
         intake.setDirection(DcMotorSimple.Direction.REVERSE);
     }
     public void intakeIn() {
-        double intakePower = 0.5;
+        double intakePower = 1;
         intake.setPower(intakePower);
         telemetry.addData("Intake Power", intakePower);
+    }
+    public void intakeStop(){
+        intake.setPower(0);
+        telemetry.addData("Intake Power", 0);
     }
 }

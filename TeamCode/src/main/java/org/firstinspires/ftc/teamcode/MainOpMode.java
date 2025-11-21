@@ -46,9 +46,10 @@ public class MainOpMode extends LinearOpMode {
             }
             if (gamepad1.y) {
                 intake.intakeIn();
+            } else {
+                intake.intakeStop();
             }
             drivetrain.resetIMU();
-            intake.intakeIn();
 
             telemetry.update();
         }
