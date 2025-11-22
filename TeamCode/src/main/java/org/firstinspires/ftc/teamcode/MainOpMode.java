@@ -30,12 +30,9 @@ public class MainOpMode extends LinearOpMode {
             lateral = gamepad1.left_stick_x;
             yaw = gamepad1.right_stick_x;
 
-            if (gamepad1.aWasPressed() && !fieldOriented) {
-                fieldOriented = true;
+            if (gamepad1.aWasPressed()) {
+                fieldOriented = !fieldOriented;
 
-            }
-            else if (gamepad1.bWasPressed() && fieldOriented){
-                fieldOriented = false;
             }
 
             if (fieldOriented) {
