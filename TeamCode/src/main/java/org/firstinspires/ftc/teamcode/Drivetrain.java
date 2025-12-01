@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
+
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
@@ -14,9 +15,10 @@ public class Drivetrain {
     public Telemetry telemetry;
     public IMU imu;
     public Gamepad gamepad1;
-    public Drivetrain(HardwareMap hardwareMap, Telemetry telemetry, Gamepad gamepad1) {
+
+    public Drivetrain(HardwareMap hardwareMap, Telemetry telemetry) {
         this.telemetry = telemetry;
-        this.gamepad1 = gamepad1;
+
         // Initialize motors with the same names from configuration
         frontLeft = hardwareMap.get(DcMotor.class, "front-left-drive");
         backLeft = hardwareMap.get(DcMotor.class, "back-left-drive");
@@ -173,9 +175,14 @@ public class Drivetrain {
 
     public void turnToAngle(double targetAngle, double power) {
 
+        frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
         double error = targetAngle - getHeading();
 
-        while (Math.abs(error) > 1) {   // stop when within ±1 degree
+        while (Math.abs(error) > 10) {   // stop when within ±1 degree
             double turnPower = error * 0.015; // slow down as you get close
             turnPower = Math.max(-power, Math.min(power, turnPower));
 
@@ -187,6 +194,10 @@ public class Drivetrain {
 
             // recalc error
             error = targetAngle - getHeading();
+
+            if (gamepad1.dpadRightWasPressed()){
+                return;
+            }
         }
 
         stop();

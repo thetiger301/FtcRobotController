@@ -14,7 +14,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
         @Override
         public void runOpMode() {
-            drivetrain = new Drivetrain(hardwareMap, telemetry, gamepad1);
+            drivetrain = new Drivetrain(hardwareMap, telemetry);
 
 
             telemetry.addLine("Initialized");

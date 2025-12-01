@@ -8,13 +8,17 @@ public class MainOpMode extends LinearOpMode {
 
     // System Declarations
     public Drivetrain drivetrain;
+    public AprilTag apriltag;
     public boolean fieldOriented;
     public double axial, lateral, yaw;
+    public boolean ColorIsBlue;
 
 
     @Override
     public void runOpMode() {
-        drivetrain = new Drivetrain(hardwareMap, telemetry, gamepad1);
+        drivetrain = new Drivetrain(hardwareMap, telemetry);
+
+        apriltag = new AprilTag(hardwareMap, telemetry);
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -30,9 +34,8 @@ public class MainOpMode extends LinearOpMode {
             lateral = gamepad1.left_stick_x;
             yaw = gamepad1.right_stick_x;
 
-            if (gamepad1.aWasPressed()) {
+            if(gamepad1.aWasPressed()){
                 fieldOriented = !fieldOriented;
-
             }
 
             if (fieldOriented) {
@@ -44,8 +47,47 @@ public class MainOpMode extends LinearOpMode {
                 telemetry.addData("Field Oriented Enabled", false);
             }
 
+
+            if (gamepad1.dpadLeftWasPressed()){
+                ColorIsBlue = !ColorIsBlue;
+            }
+
+            if (ColorIsBlue) {
+                telemetry.addData("Blue", true);
+
+            } else if (!ColorIsBlue) {
+                telemetry.addData("Blue", false);
+            }
+
+
             if(gamepad1.dpadUpWasPressed()){
                 drivetrain.resetIMU();
+            }
+
+            if(gamepad1.leftBumperWasPressed()){
+                if(ColorIsBlue){
+                    apriltag.turningTowardsBlueApriltag = true;
+                }
+                else{
+                    apriltag.turningTowardsRedApriltag = true;
+                }
+            }
+
+            if (apriltag.turningTowardsBlueApriltag) {
+                apriltag.faceBlueAprilTag();
+            }
+            if(apriltag.turningTowardsRedApriltag){
+                apriltag.faceRedAprilTag();
+            }
+            if (gamepad1.x) {
+                apriltag.giveBearing();
+            }
+
+
+            //override all aligning
+            if(gamepad1.rightBumperWasPressed()){
+                apriltag.turningTowardsBlueApriltag = false;
+                apriltag.turningTowardsRedApriltag = false;
             }
 
 
