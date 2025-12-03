@@ -30,6 +30,7 @@ public class MainOpMode extends LinearOpMode {
 
             telemetry.addData("Status", "Running");
             telemetry.addData("Inputs", "axial: %.2f, lateral: %.2f, yaw: %.2f", axial, lateral, yaw);
+            telemetry.addData("Shooter Angle Position", shooter.currentShooterPosition);
             axial = -gamepad1.left_stick_y; // Remember, Y stick value is reversed
             lateral = gamepad1.left_stick_x;
             yaw = gamepad1.right_stick_x;
@@ -52,6 +53,17 @@ public class MainOpMode extends LinearOpMode {
             if (gamepad1.dpad_up) {
                 drivetrain.resetIMU();
             }
+            if (gamepad1.rightBumperWasPressed()) {
+                shooter.currentShooterPosition = shooter.shooterPosition + 50;
+                shooter.setShooterAngle(shooter.currentShooterPosition);
+                shooter.shooterPosition = shooter.currentShooterPosition;
+            }
+            if (gamepad1.leftBumperWasPressed()) {
+                shooter.currentShooterPosition = shooter.shooterPosition - 50;
+                shooter.setShooterAngle(shooter.currentShooterPosition);
+                shooter.shooterPosition = shooter.currentShooterPosition;
+            }
+            shooter.keepShooterAngle();
             telemetry.update();
         }
     }
