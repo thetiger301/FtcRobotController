@@ -207,9 +207,10 @@ public class Drivetrain {
         backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        double error = targetAngle - getHeading();
+        double headingTarget = targetAngle + getHeading();
+        double error = headingTarget - getHeading();
 
-        while (Math.abs(error) > 5) {   // stop when within ±1 degree
+        while (Math.abs(error) > 4) {   // stop when within ±1 degree
             if (-120 > getHeading() && getHeading() > -180 && targetAngle >= 180){
                 targetAngle = targetAngle - 360;
             }
@@ -226,7 +227,7 @@ public class Drivetrain {
             backRight.setPower(turnPower);
 
             // recalc error
-            error = targetAngle - getHeading();
+            error = headingTarget - getHeading();
 
         }
 

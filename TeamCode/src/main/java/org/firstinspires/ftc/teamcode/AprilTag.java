@@ -70,8 +70,7 @@ import java.util.List;
 
             //if the tag information is not found, move 30 degree left
             if (targetTagBlue == null) {
-                double targetAngle = 20 + drivetrain.getHeading();
-                drivetrain.turnThisManyDegrees(targetAngle, .5);
+                drivetrain.turnThisManyDegrees(20, .5);
             }
             //once the tag information is found, it will stop scanning
             if (targetTagBlue != null) {
@@ -106,8 +105,7 @@ import java.util.List;
             }
             //if the tag information is not found, move 30 degree left
             if(targetTagRed == null){
-                double targetAngle = -20 + drivetrain.getHeading();
-                drivetrain.turnThisManyDegrees(targetAngle, .5);
+                drivetrain.turnThisManyDegrees(-20, .5);
             }
             //once the tag information is found, it will stop scanning
             if (targetTagRed != null) {
@@ -117,8 +115,7 @@ import java.util.List;
             //move as many degrees as the bearing
             if (redBearingIsFound){
                 if (Math.abs(bearing) > 4) {
-                    double targetAngle = bearing + drivetrain.getHeading();
-                    drivetrain.turnThisManyDegrees(targetAngle, .5);
+                    drivetrain.turnThisManyDegrees(bearing, .5);
                 } else {
                     turningTowardsRedApriltag = false; //Terminates the method once it has aligned to the tag
                 }
