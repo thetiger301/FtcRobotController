@@ -18,6 +18,7 @@ public class MainOpMode extends LinearOpMode {
         drivetrain = new Drivetrain(hardwareMap, telemetry, gamepad1);
         intake = new Intake(hardwareMap, telemetry);
 
+
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
@@ -48,6 +49,12 @@ public class MainOpMode extends LinearOpMode {
                 intake.intakeIn();
             } else {
                 intake.intakeStop();
+            }
+            if (gamepad1.leftBumperWasPressed()) {
+                intake.sorterLeft();
+            }
+            if (gamepad1.rightBumperWasPressed()) {
+                intake.sorterRight();
             }
             drivetrain.resetIMU();
 
