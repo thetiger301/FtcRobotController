@@ -21,6 +21,7 @@ import java.util.List;
 
         private boolean blueBearingIsFound = false;
         private boolean redBearingIsFound = false;
+        private double bearing = 0;
 
         public AprilTag(HardwareMap hardwareMap, Telemetry telemetry) {
             this.telemetry = telemetry;
@@ -66,23 +67,29 @@ import java.util.List;
                     }
                 }
             }
+
             //if the tag information is not found, move 30 degree left
             if (targetTagBlue == null) {
-                double targetAngle = 30 + drivetrain.getHeading();
-                drivetrain.turnToAngle(targetAngle, .5);
+                double targetAngle = 20 + drivetrain.getHeading();
+                drivetrain.turnThisManyDegrees(targetAngle, .5);
             }
             //once the tag information is found, it will stop scanning
             if (targetTagBlue != null) {
                 blueBearingIsFound = true;
+                bearing = targetTagBlue.ftcPose.bearing;
             }
             //move as many degrees as the bearing
             if (blueBearingIsFound) {
-                double targetAngle = targetTagBlue.ftcPose.bearing + drivetrain.getHeading();
-                drivetrain.turnToAngle(targetAngle, .5);
-                turningTowardsBlueApriltag = false; //Terminates the method once it has aligned to the tag
+                if (Math.abs(bearing) > 4) {
+                    double targetAngle = bearing + drivetrain.getHeading();
+                    drivetrain.turnThisManyDegrees(targetAngle, .5);
+                } if (Math.abs(bearing) <= 4) {
+                    turningTowardsBlueApriltag = false; //Terminates the method once it has aligned to the tag
+                }
             }
             //return all variables to original state
             blueBearingIsFound = false;
+            bearing = 0;
         }
 
         public void faceRedAprilTag(){
@@ -99,21 +106,26 @@ import java.util.List;
             }
             //if the tag information is not found, move 30 degree left
             if(targetTagRed == null){
-                double targetAngle = -30 + drivetrain.getHeading();
-                drivetrain.turnToAngle(targetAngle, .5);
+                double targetAngle = -20 + drivetrain.getHeading();
+                drivetrain.turnThisManyDegrees(targetAngle, .5);
             }
             //once the tag information is found, it will stop scanning
             if (targetTagRed != null) {
                 redBearingIsFound = true;
+                bearing = targetTagRed.ftcPose.bearing;
             }
             //move as many degrees as the bearing
             if (redBearingIsFound){
-                double targetAngle = targetTagRed.ftcPose.bearing + drivetrain.getHeading();
-                drivetrain.turnToAngle(targetAngle, .5);
-                turningTowardsRedApriltag = false; //Terminates the method once it has aligned to the tag
+                if (Math.abs(bearing) > 4) {
+                    double targetAngle = bearing + drivetrain.getHeading();
+                    drivetrain.turnThisManyDegrees(targetAngle, .5);
+                } else {
+                    turningTowardsRedApriltag = false; //Terminates the method once it has aligned to the tag
+                }
             }
-            //return all variables to original state
+            //return this variables to original state
             redBearingIsFound = false;
+            bearing = 0;
         }
     }
 

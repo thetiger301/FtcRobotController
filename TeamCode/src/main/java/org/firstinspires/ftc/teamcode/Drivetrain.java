@@ -35,7 +35,7 @@ public class Drivetrain {
         frontLeft.setDirection(DcMotor.Direction.REVERSE);
         backLeft.setDirection(DcMotor.Direction.FORWARD);
         frontRight.setDirection(DcMotor.Direction.FORWARD);
-        backRight.setDirection(DcMotor.Direction.FORWARD);
+        backRight.setDirection(DcMotor.Direction.REVERSE);
         imu = hardwareMap.get(IMU.class, "imu");
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
                 RevHubOrientationOnRobot.LogoFacingDirection.UP,
@@ -195,13 +195,45 @@ public class Drivetrain {
             // recalc error
             error = targetAngle - getHeading();
 
-            if (gamepad1.dpadRightWasPressed()){
-                return;
-            }
         }
 
         stop();
     }
+
+    public void turnThisManyDegrees(double targetAngle, double power) {
+
+        frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        double error = targetAngle - getHeading();
+
+        while (Math.abs(error) > 5) {   // stop when within ±1 degree
+            if (-120 > getHeading() && getHeading() > -180 && targetAngle >= 180){
+                targetAngle = targetAngle - 360;
+            }
+            if (120 < getHeading() && getHeading() <= 180 && targetAngle <= -180){
+                targetAngle = targetAngle + 360;
+            }
+            double turnPower = error * 0.04; // slow down as you get close
+            turnPower = Math.max(-power, Math.min(power, turnPower));
+
+            // turn robot
+            frontLeft.setPower(-turnPower);
+            backLeft.setPower(-turnPower);
+            frontRight.setPower(turnPower);
+            backRight.setPower(turnPower);
+
+            // recalc error
+            error = targetAngle - getHeading();
+
+        }
+
+        stop();
+    }
+
+
 
     public void strafeDistance(double inches, double power) {
         int ticksPerRev = 537; // adjust for your motor
