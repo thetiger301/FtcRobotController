@@ -17,7 +17,6 @@ public class MainOpMode extends LinearOpMode {
     @Override
     public void runOpMode() {
         drivetrain = new Drivetrain(hardwareMap, telemetry);
-
         apriltag = new AprilTag(hardwareMap, telemetry);
 
         telemetry.addData("Status", "Initialized");
@@ -25,15 +24,18 @@ public class MainOpMode extends LinearOpMode {
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
-        drivetrain.imu.resetYaw();
+        drivetrain.resetIMU();
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             // Competition Program
-            axial = -gamepad1.left_stick_y; // Remember, Y stick value is reversed
+
+            //Drivetrain control
+            axial = -gamepad1.left_stick_y;
             lateral = gamepad1.left_stick_x;
             yaw = gamepad1.right_stick_x;
 
+            // Field oriented drive toggle
             if(gamepad1.aWasPressed()){
                 fieldOriented = !fieldOriented;
             }
@@ -41,27 +43,21 @@ public class MainOpMode extends LinearOpMode {
             if (fieldOriented) {
                 drivetrain.fieldOrientedDrive(axial, lateral, yaw);
                 telemetry.addData("Field Oriented Enabled", true);
-
             } else if (!fieldOriented) {
                 drivetrain.drive(axial, lateral, yaw);
                 telemetry.addData("Field Oriented Enabled", false);
             }
 
-
+            //Set Alliance Color
             if (gamepad1.dpadLeftWasPressed()){
                 ColorIsBlue = !ColorIsBlue;
             }
 
             if (ColorIsBlue) {
-                telemetry.addData("Blue", true);
+                telemetry.addLine("Alliance Color is BLue");
 
             } else if (!ColorIsBlue) {
-                telemetry.addData("Blue", false);
-            }
-
-
-            if(gamepad1.dpadUpWasPressed()){
-                drivetrain.resetIMU();
+                telemetry.addLine("Alliance Color is Red");
             }
 
             if(gamepad1.leftBumperWasPressed()){
@@ -73,6 +69,7 @@ public class MainOpMode extends LinearOpMode {
                 }
             }
 
+            //Align to apriltag
             if (apriltag.turningTowardsBlueApriltag) {
                 apriltag.faceBlueAprilTag();
             }
@@ -83,13 +80,16 @@ public class MainOpMode extends LinearOpMode {
                 apriltag.giveBearing();
             }
 
-
             //override all aligning
             if(gamepad1.rightBumperWasPressed()){
                 apriltag.turningTowardsBlueApriltag = false;
                 apriltag.turningTowardsRedApriltag = false;
             }
 
+            //Reset robot heading
+            if(gamepad1.dpadUpWasPressed()){
+                drivetrain.resetIMU();
+            }
 
             telemetry.addData("Status", "Running");
             telemetry.addData("Inputs", "axial: %.2f, lateral: %.2f, yaw: %.2f", axial, lateral, yaw);

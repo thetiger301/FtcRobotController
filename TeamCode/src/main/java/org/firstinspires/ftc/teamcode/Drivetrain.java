@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 
@@ -11,11 +10,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 
 public class Drivetrain {
-    public DcMotor frontLeft, frontRight, backLeft, backRight;
-    public Telemetry telemetry;
-    public IMU imu;
-    public Gamepad gamepad1;
-
+    private DcMotor frontLeft, frontRight, backLeft, backRight;
+    private Telemetry telemetry;
+    private IMU imu;
     public Drivetrain(HardwareMap hardwareMap, Telemetry telemetry) {
         this.telemetry = telemetry;
 
@@ -175,11 +172,6 @@ public class Drivetrain {
 
     public void turnToAngle(double targetAngle, double power) {
 
-        frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
         double error = targetAngle - getHeading();
 
         while (Math.abs(error) > 10) {   // stop when within ±1 degree
@@ -202,13 +194,7 @@ public class Drivetrain {
 
     public void turnThisManyDegrees(double targetAngle, double power) {
 
-        frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-        double headingTarget = targetAngle + getHeading();
-        double error = headingTarget - getHeading();
+        double error = targetAngle - getHeading();
 
         while (Math.abs(error) > 4) {   // stop when within ±1 degree
             if (-120 > getHeading() && getHeading() > -180 && targetAngle >= 180){

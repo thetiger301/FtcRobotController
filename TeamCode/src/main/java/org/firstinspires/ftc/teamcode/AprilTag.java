@@ -55,6 +55,32 @@ import java.util.List;
             }
         }
 
+        public void giveRange() {
+            AprilTagDetection targetTagRed = null;
+            AprilTagDetection targetTagBlue = null;
+            List<AprilTagDetection> detections = aprilTagProcessor.getDetections();
+            for (AprilTagDetection tag : detections) {
+                if (tag.id == 24) {
+                    targetTagRed = tag;
+                    break;  // Stop looping once we find it
+                } else if (tag.id == 20) {
+                    targetTagBlue = tag;
+                    break;
+                }
+            }
+            if (targetTagRed != null) {
+                double range = targetTagRed.ftcPose.range;  // degrees
+                telemetry.addData("Target Tag", "Red Tag");
+                telemetry.addData("Range", "%.1f", range);
+            } else if (targetTagBlue != null) {
+                double range = targetTagBlue.ftcPose.range;  // degrees
+                telemetry.addData("Target Tag", "Blue Tag");
+                telemetry.addData("Range", "%.1f", range);
+            } else {
+                telemetry.addLine("Tag not Detected");
+            }
+        }
+
         public void faceBlueAprilTag() {
             telemetry.addLine("move to blue");
             AprilTagDetection targetTagBlue = null;
@@ -82,7 +108,7 @@ import java.util.List;
                 if (Math.abs(bearing) > 4) {
                     double targetAngle = bearing + drivetrain.getHeading();
                     drivetrain.turnThisManyDegrees(targetAngle, .5);
-                } if (Math.abs(bearing) <= 4) {
+                } else {
                     turningTowardsBlueApriltag = false; //Terminates the method once it has aligned to the tag
                 }
             }
@@ -115,7 +141,8 @@ import java.util.List;
             //move as many degrees as the bearing
             if (redBearingIsFound){
                 if (Math.abs(bearing) > 4) {
-                    drivetrain.turnThisManyDegrees(bearing, .5);
+                    double targetAngle =bearing + drivetrain.getHeading();
+                    drivetrain.turnThisManyDegrees(targetAngle, .5);
                 } else {
                     turningTowardsRedApriltag = false; //Terminates the method once it has aligned to the tag
                 }
@@ -125,4 +152,4 @@ import java.util.List;
             bearing = 0;
         }
     }
-
+    
