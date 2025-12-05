@@ -9,6 +9,8 @@ public class MainOpMode extends LinearOpMode {
     // System Declarations
     public Drivetrain drivetrain;
     public Shooter shooter;
+    public AprilTag apriltag;
+    public Intake intake;
     public boolean fieldOriented;
     public double axial, lateral, yaw;
 
@@ -17,6 +19,8 @@ public class MainOpMode extends LinearOpMode {
     public void runOpMode() {
         drivetrain = new Drivetrain(hardwareMap, telemetry, gamepad1);
         shooter = new Shooter(hardwareMap, telemetry);
+        apriltag = new AprilTag(hardwareMap, telemetry);
+        intake = new Intake(hardwareMap, telemetry);
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -53,7 +57,7 @@ public class MainOpMode extends LinearOpMode {
             if (gamepad1.dpad_up) {
                 drivetrain.resetIMU();
             }
-            if (gamepad1.rightBumperWasPressed()) {
+            /* if (gamepad1.rightBumperWasPressed()) {
                 shooter.currentShooterPosition = shooter.shooterPosition + 50;
                 shooter.setShooterAngle(shooter.currentShooterPosition);
                 shooter.shooterPosition = shooter.currentShooterPosition;
@@ -63,7 +67,31 @@ public class MainOpMode extends LinearOpMode {
                 shooter.setShooterAngle(shooter.currentShooterPosition);
                 shooter.shooterPosition = shooter.currentShooterPosition;
             }
+            */
+            if (gamepad1.y) {
+                apriltag.giveRange();
+            }
+
+            if(gamepad1.left_trigger > 0.2){
+                shooter.setWhiteFeederPower(1);
+            }else{
+                shooter.setWhiteFeederPower(0);
+            }
+            //if(gamepad1.right_trigger > 0.2){
+            //    shooter.setGrayFeederPower(1);
+            //}else{
+             //   shooter.setGrayFeederPower(0.5);
+            //}
+
+            if(gamepad1.dpad_down){
+                intake.sorterRight();
+                //intake.intakeIn();
+            } //else  {
+                //intake.intakeStop();
+            //}
+
             shooter.keepShooterAngle();
+            telemetry.addData("Shooter angle in ticks", shooter.currentShooterPosition);
             telemetry.update();
         }
     }
