@@ -152,4 +152,3 @@ import java.util.List;
             bearing = 0;
         }
     }
-    

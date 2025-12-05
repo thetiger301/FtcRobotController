@@ -213,7 +213,7 @@ public class Drivetrain {
             backRight.setPower(turnPower);
 
             // recalc error
-            error = headingTarget - getHeading();
+            error = targetAngle - getHeading();
 
         }
 
