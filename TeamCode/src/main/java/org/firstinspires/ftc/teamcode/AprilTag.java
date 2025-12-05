@@ -22,6 +22,8 @@ import java.util.List;
         private boolean blueBearingIsFound = false;
         private boolean redBearingIsFound = false;
         private double bearing = 0;
+        public boolean isRedAligned;
+        public boolean isBlueAligned;
 
         public AprilTag(HardwareMap hardwareMap, Telemetry telemetry) {
             this.telemetry = telemetry;
@@ -105,11 +107,12 @@ import java.util.List;
             }
             //move as many degrees as the bearing
             if (blueBearingIsFound) {
-                if (Math.abs(bearing) > 4) {
+                if (Math.abs(bearing) > 8) {
                     double targetAngle = bearing + drivetrain.getHeading();
                     drivetrain.turnThisManyDegrees(targetAngle, .5);
                 } else {
                     turningTowardsBlueApriltag = false; //Terminates the method once it has aligned to the tag
+                    
                 }
             }
             //return all variables to original state
