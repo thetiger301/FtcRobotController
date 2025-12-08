@@ -91,6 +91,10 @@ public class MainOpMode extends LinearOpMode {
                 drivetrain.resetIMU();
             }
 
+            if(gamepad1.y) {
+                apriltag.getHuskyLensData();
+            }
+
             telemetry.addData("Status", "Running");
             telemetry.addData("Inputs", "axial: %.2f, lateral: %.2f, yaw: %.2f", axial, lateral, yaw);
             telemetry.addData("Heading", drivetrain.getHeading());

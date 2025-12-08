@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.hardware.dfrobot.HuskyLens;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -16,15 +17,19 @@ import java.util.List;
         private Telemetry telemetry;
         private HardwareMap hardwareMap;
         private Drivetrain drivetrain;
+        private HuskyLens huskyLens;
         public boolean turningTowardsBlueApriltag = false;
         public boolean turningTowardsRedApriltag = false;
 
         private boolean blueBearingIsFound = false;
         private boolean redBearingIsFound = false;
         private double bearing = 0;
+        private String color = null;
 
         public AprilTag(HardwareMap hardwareMap, Telemetry telemetry) {
             this.telemetry = telemetry;
+            huskyLens = hardwareMap.get(HuskyLens.class, "Husky Lens");
+            huskyLens.selectAlgorithm(HuskyLens.Algorithm.COLOR_RECOGNITION);
             aprilTagProcessor = AprilTagProcessor.easyCreateWithDefaults();
             visionPortal = VisionPortal.easyCreateWithDefaults(hardwareMap.get(WebcamName.class, "Webcam 1"), aprilTagProcessor);
             drivetrain = new Drivetrain(hardwareMap, telemetry);
@@ -150,5 +155,21 @@ import java.util.List;
             //return this variables to original state
             redBearingIsFound = false;
             bearing = 0;
+        }
+        public void getHuskyLensData() {
+            HuskyLens.Block[] blocks = huskyLens.blocks();
+
+            for (int i = 0; i < blocks.length; i++) {
+                // Access data fields for each block:
+                // blocks[i].id: The learned ID of the object (e.g., 1, 2)
+                // blocks[i].x, blocks[i].y: Center coordinates (origin top-left)
+                // blocks[i].width, blocks[i].height: Size in pixels
+                if (blocks[i].id == 1) {
+                    color = "Purple";
+                } else if (blocks[i].id == 2) {
+                    color = "Green";
+                }
+                telemetry.addData("Block " + i, "ID: " + blocks[i].id + " X: " + blocks[i].x + " Y: " + blocks[i].y + "Color: " + color);
+            }
         }
     }
