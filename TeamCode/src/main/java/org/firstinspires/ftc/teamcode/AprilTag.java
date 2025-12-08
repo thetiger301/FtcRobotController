@@ -24,7 +24,7 @@ import java.util.List;
         private boolean blueBearingIsFound = false;
         private boolean redBearingIsFound = false;
         private double bearing = 0;
-        private String color = null;
+        private String ballColor = null;
 
         public AprilTag(HardwareMap hardwareMap, Telemetry telemetry) {
             this.telemetry = telemetry;
@@ -164,12 +164,14 @@ import java.util.List;
                 // blocks[i].id: The learned ID of the object (e.g., 1, 2)
                 // blocks[i].x, blocks[i].y: Center coordinates (origin top-left)
                 // blocks[i].width, blocks[i].height: Size in pixels
-                if (blocks[i].id == 1) {
-                    color = "Purple";
-                } else if (blocks[i].id == 2) {
-                    color = "Green";
+                if (blocks[i].x < 225) {
+                    if (blocks[i].id == 1) {
+                        ballColor = "Purple";
+                    } else if (blocks[i].id == 2) {
+                        ballColor = "Green";
+                    }
                 }
-                telemetry.addData("Block " + i, "ID: " + blocks[i].id + " X: " + blocks[i].x + " Y: " + blocks[i].y + "Color: " + color);
+                telemetry.addData("Block " + i, "ID: " + blocks[i].id + " X: " + blocks[i].x + " Y: " + blocks[i].y + "Color: " + ballColor);
             }
         }
     }
