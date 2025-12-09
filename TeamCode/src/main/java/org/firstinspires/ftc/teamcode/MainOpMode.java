@@ -9,10 +9,12 @@ public class MainOpMode extends LinearOpMode {
     // System Declarations
     public Drivetrain drivetrain;
     public AprilTag apriltag;
+    public ShooterIntakeMechanism shooterIntakeMechanism;
     public boolean fieldOriented;
     public double axial, lateral, yaw;
     public boolean ColorIsBlue;
-
+    public boolean isIntakeRunning;
+    public boolean isShooterRunning;
 
 
 
@@ -20,6 +22,8 @@ public class MainOpMode extends LinearOpMode {
     public void runOpMode() {
         drivetrain = new Drivetrain(hardwareMap, telemetry);
         apriltag = new AprilTag(hardwareMap, telemetry);
+        shooterIntakeMechanism = new ShooterIntakeMechanism(hardwareMap, telemetry);
+
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -54,7 +58,6 @@ public class MainOpMode extends LinearOpMode {
             if (gamepad1.dpadLeftWasPressed()){
                 ColorIsBlue = !ColorIsBlue;
             }
-
             if (ColorIsBlue) {
                 telemetry.addLine("Alliance Color is BLue");
 
@@ -62,6 +65,30 @@ public class MainOpMode extends LinearOpMode {
                 telemetry.addLine("Alliance Color is Red");
             }
 
+            //turns the intake on and off
+            if (gamepad1.leftStickButtonWasPressed()){
+                isIntakeRunning = !isIntakeRunning;
+            }
+            if (isIntakeRunning) {
+                shooterIntakeMechanism.runIntake();
+            }
+            if(!isIntakeRunning){
+                shooterIntakeMechanism.stopIntake();
+            }
+
+            //turns the shooter on and off
+            if(gamepad1.rightStickButtonWasPressed()){
+                isShooterRunning = !isShooterRunning;
+            }
+            if(isShooterRunning){
+                shooterIntakeMechanism.runShooter();
+            }
+            if(!isShooterRunning){
+                shooterIntakeMechanism.stopShooter();
+            }
+
+
+            //sets the variable for aligning
             if(gamepad1.leftBumperWasPressed()){
                 if(ColorIsBlue){
                     apriltag.turningTowardsBlueApriltag = true;

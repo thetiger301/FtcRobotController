@@ -29,7 +29,7 @@ import java.util.List;
             this.telemetry = telemetry;
             aprilTagProcessor = AprilTagProcessor.easyCreateWithDefaults();
             visionPortal = VisionPortal.easyCreateWithDefaults(hardwareMap.get(WebcamName.class, "Webcam 1"), aprilTagProcessor);
-            drivetrain = new Drivetrain(hardwareMap, telemetry);
+            //drivetrain = new Drivetrain(hardwareMap, telemetry);
         }
         public void giveBearing() {
             AprilTagDetection targetTagRed = null;
