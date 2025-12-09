@@ -106,7 +106,7 @@ import java.util.List;
             //move as many degrees as the bearing
             if (blueBearingIsFound) {
                 if (Math.abs(bearing) > 4) {
-                    double targetAngle = bearing + drivetrain.getHeading();
+                    double targetAngle = bearing;
                     drivetrain.turnThisManyDegrees(targetAngle, .5);
                 } else {
                     turningTowardsBlueApriltag = false; //Terminates the method once it has aligned to the tag
@@ -141,7 +141,7 @@ import java.util.List;
             //move as many degrees as the bearing
             if (redBearingIsFound){
                 if (Math.abs(bearing) > 4) {
-                    double targetAngle =bearing + drivetrain.getHeading();
+                    double targetAngle = bearing;
                     drivetrain.turnThisManyDegrees(targetAngle, .5);
                 } else {
                     turningTowardsRedApriltag = false; //Terminates the method once it has aligned to the tag

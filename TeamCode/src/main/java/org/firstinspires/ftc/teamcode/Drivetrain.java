@@ -13,6 +13,19 @@ public class Drivetrain {
     private DcMotor frontLeft, frontRight, backLeft, backRight;
     private Telemetry telemetry;
     private IMU imu;
+    // Constants for PID Output
+    private double kP = 0.04;
+    private double kI = 0;
+    private double kD = 0;
+    // error turn to degrees methode gets within
+    private double errorTolerance = 4;
+    // pid variables
+    private double integral = 0;
+    private double integralMax = 1000;
+    private double lastError = 0;
+    private long lastTimeMs = -1;
+    private long timeOnTargetMs = -1;
+    private long onTargetStart;
     public Drivetrain(HardwareMap hardwareMap, Telemetry telemetry) {
         this.telemetry = telemetry;
 
@@ -193,17 +206,13 @@ public class Drivetrain {
     }
 
     public void turnThisManyDegrees(double targetAngle, double power) {
+        resetPid();
+        double currentHeading = getHeading();
+        double targetHeading = targetAngle + currentHeading;
+        double error = targetHeading - currentHeading;
 
-        double error = targetAngle - getHeading();
-
-        while (Math.abs(error) > 4) {   // stop when within ±1 degree
-            if (-120 > getHeading() && getHeading() > -180 && targetAngle >= 180){
-                targetAngle = targetAngle - 360;
-            }
-            if (120 < getHeading() && getHeading() <= 180 && targetAngle <= -180){
-                targetAngle = targetAngle + 360;
-            }
-            double turnPower = error * 0.04; // slow down as you get close
+        while(error >= errorTolerance) {
+            double turnPower = pidOutput(error);
             turnPower = Math.max(-power, Math.min(power, turnPower));
 
             // turn robot
@@ -213,14 +222,69 @@ public class Drivetrain {
             backRight.setPower(turnPower);
 
             // recalc error
-            error = targetAngle - getHeading();
-
+            currentHeading = getHeading();
+            if (-120 > currentHeading && currentHeading > -180 && targetHeading >= 180){
+                targetHeading = targetHeading - 360;
+            }
+            if (120 < currentHeading && currentHeading <= 180 && targetHeading <= -180){
+                targetHeading = targetHeading + 360;
+            }
+            error = targetHeading - currentHeading;
         }
+        onTargetStart = System.currentTimeMillis();
+        while(System.currentTimeMillis() - onTargetStart <= timeOnTargetMs) {
+            double turnPower = pidOutput(error);
+            turnPower = Math.max(-power, Math.min(power, turnPower));
 
+            // turn robot
+            frontLeft.setPower(-turnPower);
+            backLeft.setPower(-turnPower);
+            frontRight.setPower(turnPower);
+            backRight.setPower(turnPower);
+
+            // recalc error
+            currentHeading = getHeading();
+            if (-120 > currentHeading && currentHeading > -180 && targetHeading >= 180){
+                targetHeading = targetHeading - 360;
+            }
+            if (120 < currentHeading && currentHeading <= 180 && targetHeading <= -180){
+                targetHeading = targetHeading + 360;
+            }
+            error = targetHeading - currentHeading;
+        }
         stop();
     }
 
+    public double pidOutput(double error) {
+        long now = System.currentTimeMillis();
+        double dt = 0.02; // default dt 20 ms
+        if (lastTimeMs >= 0) dt = (now - lastTimeMs) / 1000.0;
+        lastTimeMs = now;
 
+        // integral accumulation with simple anti-windup
+        if (Math.abs(error) < 30) { // only accumulate when reasonably near
+            integral += error * dt;
+        } else {
+            integral = 0; // reset if far away (optional)
+        }
+        // cap integral
+        if (integral > integralMax) integral = integralMax;
+        if (integral < -integralMax) integral = -integralMax;
+
+        // derivative
+        double derivative = 0;
+        if (dt > 0) derivative = (error - lastError) / dt;
+
+        lastError = error;
+
+        return kP * error + kI * integral + kD * derivative;
+    }
+
+    public void resetPid() {
+        integral = 0;
+        lastError = 0;
+        lastTimeMs = -1;
+    }
 
     public void strafeDistance(double inches, double power) {
         int ticksPerRev = 537; // adjust for your motor
