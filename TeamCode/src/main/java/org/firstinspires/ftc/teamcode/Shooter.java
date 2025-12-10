@@ -10,6 +10,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class Shooter {
     private DcMotor shooterMotor;
     private DcMotor shooterAngle;
+    private DcMotor intake;
     public CRServo whiteFeeder;
     //public CRServo greyFeeder;
 
@@ -22,6 +23,7 @@ public class Shooter {
         this.telemetry = telemetry;
         shooterMotor = hardwareMap.get(DcMotor.class, "shooter");
         shooterAngle = hardwareMap.get(DcMotor.class, "shooter angle");
+        intake = hardwareMap.get(DcMotor.class, "intake");
         whiteFeeder = hardwareMap.get(CRServo.class, "white feeder");
         //greyFeeder = hardwareMap.get(CRServo.class, "grey feeder");
         shooterMotor.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -54,5 +56,10 @@ public class Shooter {
     public void setGrayFeederPower(double power) {
         whiteFeeder.setPower(power);
     }
-
+    public void runIntake() {
+        intake.setPower(1);
+    }
+    public void stopIntake() {
+        intake.setPower(0);
+    }
 }

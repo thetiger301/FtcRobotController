@@ -54,6 +54,11 @@ public class MainOpMode extends LinearOpMode {
             } else {
                 shooter.stopShooter();
             }
+            if(gamepad1.dpad_left) {
+                shooter.runIntake();
+            } else {
+                shooter.stopIntake();
+            }
             if (gamepad1.dpad_up) {
                 drivetrain.resetIMU();
             }
@@ -81,13 +86,6 @@ public class MainOpMode extends LinearOpMode {
             //    shooter.setGrayFeederPower(1);
             //}else{
              //   shooter.setGrayFeederPower(0.5);
-            //}
-
-            if(gamepad1.dpad_down){
-                intake.sorterRight();
-                //intake.intakeIn();
-            } //else  {
-                //intake.intakeStop();
             //}
 
             shooter.keepShooterAngle();
