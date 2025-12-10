@@ -214,7 +214,6 @@ public class Drivetrain {
 
             // recalc error
             error = targetAngle - getHeading();
-
         }
 
         stop();
