@@ -96,7 +96,8 @@ import java.util.List;
 
             //if the tag information is not found, move 30 degree left
             if (targetTagBlue == null) {
-                drivetrain.turnThisManyDegrees(20, .5);
+                double targetAngle = 20 + drivetrain.getHeading();
+                drivetrain.turnThisManyDegrees(targetAngle, .5);
             }
             //once the tag information is found, it will stop scanning
             if (targetTagBlue != null) {
@@ -105,7 +106,7 @@ import java.util.List;
             }
             //move as many degrees as the bearing
             if (blueBearingIsFound) {
-                if (Math.abs(bearing) > 4) {
+                if (Math.abs(bearing) > 2) {
                     double targetAngle = bearing + drivetrain.getHeading();
                     drivetrain.turnThisManyDegrees(targetAngle, .5);
                 } else {
@@ -131,7 +132,8 @@ import java.util.List;
             }
             //if the tag information is not found, move 30 degree left
             if(targetTagRed == null){
-                drivetrain.turnThisManyDegrees(-20, .5);
+                double targetAngle = drivetrain.getHeading() - 20;
+                drivetrain.turnThisManyDegrees(targetAngle, .5);
             }
             //once the tag information is found, it will stop scanning
             if (targetTagRed != null) {
@@ -140,7 +142,7 @@ import java.util.List;
             }
             //move as many degrees as the bearing
             if (redBearingIsFound){
-                if (Math.abs(bearing) > 4) {
+                if (Math.abs(bearing) > 2) {
                     double targetAngle =bearing + drivetrain.getHeading();
                     drivetrain.turnThisManyDegrees(targetAngle, .5);
                 } else {

@@ -13,6 +13,7 @@ public class Drivetrain {
     private DcMotor frontLeft, frontRight, backLeft, backRight;
     private Telemetry telemetry;
     private IMU imu;
+    private long errorTolerance = 2;
     public Drivetrain(HardwareMap hardwareMap, Telemetry telemetry) {
         this.telemetry = telemetry;
 
@@ -196,7 +197,7 @@ public class Drivetrain {
 
         double error = targetAngle - getHeading();
 
-        while (Math.abs(error) > 4) {   // stop when within ±1 degree
+        while (Math.abs(error) > errorTolerance) {   // stop when within ±1 degree
             if (-120 > getHeading() && getHeading() > -180 && targetAngle >= 180){
                 targetAngle = targetAngle - 360;
             }
@@ -216,7 +217,6 @@ public class Drivetrain {
             error = targetAngle - getHeading();
 
         }
-
         stop();
     }
 
