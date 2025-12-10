@@ -4,6 +4,7 @@ import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -26,6 +27,7 @@ public class Drivetrain {
     private long lastTimeMs = -1;
     private long timeOnTargetMs = -1;
     private long onTargetStart;
+    private ElapsedTime timeOnTargetTimer = new ElapsedTime();
     public Drivetrain(HardwareMap hardwareMap, Telemetry telemetry) {
         this.telemetry = telemetry;
 
@@ -231,8 +233,8 @@ public class Drivetrain {
             }
             error = targetHeading - currentHeading;
         }
-        onTargetStart = System.currentTimeMillis();
-        while(System.currentTimeMillis() - onTargetStart <= timeOnTargetMs) {
+        timeOnTargetTimer.reset();
+        while(timeOnTargetTimer.seconds() <= timeOnTargetMs) {
             double turnPower = pidOutput(error);
             turnPower = Math.max(-power, Math.min(power, turnPower));
 
@@ -254,7 +256,6 @@ public class Drivetrain {
         }
         stop();
     }
-
     public double pidOutput(double error) {
         long now = System.currentTimeMillis();
         double dt = 0.02; // default dt 20 ms
