@@ -12,9 +12,7 @@ public class MainOpMode extends LinearOpMode {
     public ShooterIntakeMechanism shooterIntakeMechanism;
     public boolean fieldOriented;
     public double axial, lateral, yaw;
-    public boolean ColorIsBlue;
-    public boolean isIntakeRunning;
-    public boolean isShooterRunning;
+
 
 
 
@@ -56,63 +54,39 @@ public class MainOpMode extends LinearOpMode {
 
             //Set Alliance Color
             if (gamepad1.dpadLeftWasPressed()){
-                ColorIsBlue = !ColorIsBlue;
+                shooterIntakeMechanism.colorIsBlue = !shooterIntakeMechanism.colorIsBlue;
             }
-            if (ColorIsBlue) {
-                telemetry.addLine("Alliance Color is BLue");
-
-            } else if (!ColorIsBlue) {
-                telemetry.addLine("Alliance Color is Red");
+            if (shooterIntakeMechanism.colorIsBlue) {
+                telemetry.addLine("Alliance Color Blue");
+            } else{
+                telemetry.addLine("Alliance Color Red");
             }
 
             //turns the intake on and off
             if (gamepad1.leftStickButtonWasPressed()){
-                isIntakeRunning = !isIntakeRunning;
+                shooterIntakeMechanism.isIntakeRunning = !shooterIntakeMechanism.isIntakeRunning;
             }
-            if (isIntakeRunning) {
+            if (shooterIntakeMechanism.isIntakeRunning) {
                 shooterIntakeMechanism.runIntake();
             }
-            if(!isIntakeRunning){
+            if(!shooterIntakeMechanism.isIntakeRunning){
                 shooterIntakeMechanism.stopIntake();
             }
 
             //turns the shooter on and off
             if(gamepad1.rightStickButtonWasPressed()){
-                isShooterRunning = !isShooterRunning;
+                shooterIntakeMechanism.isShooterRunning = !shooterIntakeMechanism.isShooterRunning;
             }
-            if(isShooterRunning){
+            if(shooterIntakeMechanism.isShooterRunning){
                 shooterIntakeMechanism.runShooter();
             }
-            if(!isShooterRunning){
+            if(!shooterIntakeMechanism.isShooterRunning){
                 shooterIntakeMechanism.stopShooter();
             }
 
-
-            //sets the variable for aligning
-            if(gamepad1.leftBumperWasPressed()){
-                if(ColorIsBlue){
-                    apriltag.turningTowardsBlueApriltag = true;
-                }
-                else{
-                    apriltag.turningTowardsRedApriltag = true;
-                }
-            }
-
-            //Align to apriltag
-            if (apriltag.turningTowardsBlueApriltag) {
-                apriltag.faceBlueAprilTag();
-            }
-            if(apriltag.turningTowardsRedApriltag){
-                apriltag.faceRedAprilTag();
-            }
+            //give the bearing
             if (gamepad1.x) {
                 apriltag.giveBearing();
-            }
-
-            //override all aligning
-            if(gamepad1.rightBumperWasPressed()){
-                apriltag.turningTowardsBlueApriltag = false;
-                apriltag.turningTowardsRedApriltag = false;
             }
 
             //Reset robot heading
