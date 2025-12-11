@@ -13,6 +13,7 @@ import java.util.List;
     public class AprilTag {
         private VisionPortal visionPortal;
         private AprilTagProcessor aprilTagProcessor;
+
         private Telemetry telemetry;
         private HardwareMap hardwareMap;
         private Drivetrain drivetrain;
@@ -24,12 +25,19 @@ import java.util.List;
         private double bearing = 0;
         public boolean isRedAligned;
         public boolean isBlueAligned;
+        public boolean isRedRangeFound = false;
+        public boolean isBlueRangeFound = false;
+        private double range = 0;
+        private double targetRange = 0;
+        public boolean isAtTargetRange;
+
+
 
         public AprilTag(HardwareMap hardwareMap, Telemetry telemetry) {
             this.telemetry = telemetry;
             aprilTagProcessor = AprilTagProcessor.easyCreateWithDefaults();
             visionPortal = VisionPortal.easyCreateWithDefaults(hardwareMap.get(WebcamName.class, "Webcam 1"), aprilTagProcessor);
-            //drivetrain = new Drivetrain(hardwareMap, telemetry);
+            drivetrain = new Drivetrain(hardwareMap, telemetry);
         }
         public void giveBearing() {
             AprilTagDetection targetTagRed = null;
@@ -107,8 +115,8 @@ import java.util.List;
             }
             //move as many degrees as the bearing
             if (blueBearingIsFound) {
-                if (Math.abs(bearing) > 10) {
-                    double targetAngle = bearing + drivetrain.getHeading();
+                if (Math.abs(bearing) > 2) {
+                    double targetAngle = bearing;
                     drivetrain.turnThisManyDegrees(targetAngle, .5);
                 } else {
                     turningTowardsBlueApriltag = false; //Terminates the method once it has aligned to the tag
@@ -143,10 +151,11 @@ import java.util.List;
             }
             //move as many degrees as the bearing
             if (redBearingIsFound){
-                if (Math.abs(bearing) > 4) {
-                    double targetAngle =bearing + drivetrain.getHeading();
+                if (Math.abs(bearing) > 2) {
+                    double targetAngle = bearing;
                     drivetrain.turnThisManyDegrees(targetAngle, .5);
                 } else {
+                    isRedAligned = true;
                     turningTowardsRedApriltag = false; //Terminates the method once it has aligned to the tag
                 }
             }
@@ -154,4 +163,63 @@ import java.util.List;
             redBearingIsFound = false;
             bearing = 0;
         }
+
+        public void driveTowardsRedApriltag(){
+            telemetry.addLine("move to red");
+            AprilTagDetection targetTagRed = null;
+            //scan for tag information while the bearing is unknown
+            if(!isRedRangeFound) {
+                List<AprilTagDetection> detections = aprilTagProcessor.getDetections();
+                for (AprilTagDetection tag : detections) {
+                    if (tag.id == 24) {
+                        targetTagRed = tag;
+                    }
+                }
+            }
+            //once the tag information is found, it will stop scanning
+            if (targetTagRed != null) {
+                isRedRangeFound = true;
+                range = targetTagRed.ftcPose.range;
+            }
+            //move forward or backward to target range
+            if (isRedRangeFound){
+                targetRange = range - 41;
+                drivetrain.driveForwardDistance(targetRange, .5);
+            }
+            //return this variables to original state
+            isRedRangeFound = false;
+            range = 0;
+        }
+
+
+        public void driveTowardsBlueApriltag(){
+            telemetry.addLine("move to red");
+            AprilTagDetection targetTagBlue = null;
+            //scan for tag information while the bearing is unknown
+            if(!isBlueRangeFound) {
+                List<AprilTagDetection> detections = aprilTagProcessor.getDetections();
+                for (AprilTagDetection tag : detections) {
+                    if (tag.id == 20) {
+                        targetTagBlue = tag;
+                    }
+                }
+            }
+            //once the tag information is found, it will stop scanning
+            if (targetTagBlue != null) {
+                isRedRangeFound = true;
+                range = targetTagBlue.ftcPose.range;
+            }
+            //move forward or backward to target range
+            if (isBlueRangeFound){
+                targetRange = range - 41;
+                drivetrain.driveForwardDistance(targetRange, .5);
+            }
+            //return this variables to original state
+            isBlueRangeFound = false;
+            range = 0;
+        }
+
     }
+
+
+

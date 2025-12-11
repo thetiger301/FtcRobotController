@@ -13,6 +13,8 @@ public class Drivetrain {
     private DcMotor frontLeft, frontRight, backLeft, backRight;
     private Telemetry telemetry;
     private IMU imu;
+    private double kP = 0.04;
+    private double errorTolerance = 2;
     public Drivetrain(HardwareMap hardwareMap, Telemetry telemetry) {
         this.telemetry = telemetry;
 
@@ -36,7 +38,7 @@ public class Drivetrain {
         imu = hardwareMap.get(IMU.class, "imu");
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
                 RevHubOrientationOnRobot.LogoFacingDirection.UP,
-                RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD));
+                RevHubOrientationOnRobot.UsbFacingDirection.LEFT));
         imu.initialize(parameters);
     }
 
@@ -194,16 +196,12 @@ public class Drivetrain {
 
     public void turnThisManyDegrees(double targetAngle, double power) {
 
-        double error = targetAngle - getHeading();
+        double targetHeading = targetAngle + getHeading();
+        double error = targetHeading - getHeading();
 
-        while (Math.abs(error) > 4) {   // stop when within ±1 degree
-            if (-120 > getHeading() && getHeading() > -180 && targetAngle >= 180){
-                targetAngle = targetAngle - 360;
-            }
-            if (120 < getHeading() && getHeading() <= 180 && targetAngle <= -180){
-                targetAngle = targetAngle + 360;
-            }
-            double turnPower = error * 0.04; // slow down as you get close
+        while (Math.abs(error) > errorTolerance) {   // stop when within ±1 degree
+
+            double turnPower = error * kP; // slow down as you get close
             turnPower = Math.max(-power, Math.min(power, turnPower));
 
             // turn robot
@@ -213,14 +211,18 @@ public class Drivetrain {
             backRight.setPower(turnPower);
 
             // recalc error
-            error = targetAngle - getHeading();
+            if (-120 > getHeading() && getHeading() > -180 && targetHeading >= 180){
+                targetHeading = targetHeading - 360;
+            }
+            if (120 < getHeading() && getHeading() <= 180 && targetHeading <= -180){
+                targetHeading = targetHeading + 360;
+            }
+            error = targetHeading - getHeading();
 
         }
 
         stop();
     }
-
-
 
     public void strafeDistance(double inches, double power) {
         int ticksPerRev = 537; // adjust for your motor

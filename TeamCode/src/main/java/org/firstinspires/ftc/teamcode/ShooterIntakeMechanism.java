@@ -1,9 +1,9 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.dfrobot.HuskyLens;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
@@ -14,8 +14,9 @@ public class ShooterIntakeMechanism {
     private AprilTag apriltag;
     private Servo sorter;
     private DcMotor intake;
-    private DcMotor shooter;
+
     private DcMotor angle;
+    private DcMotor shooter;
     private String ballColor;
     private boolean purpleBallDetected;
     private boolean greenBallDetected;
@@ -23,16 +24,18 @@ public class ShooterIntakeMechanism {
     public boolean colorIsBlue;
     public boolean isIntakeRunning;
     public boolean isShooterRunning;
+    public boolean isShooterMotorRunning;
 
 
-    public ShooterIntakeMechanism(HardwareMap hardwareMap, Telemetry telemetry){
-        //apriltag = new AprilTag(hardwareMap, telemetry);
-        huskyLens = hardwareMap.get(HuskyLens.class, "Husky Lens");
+    public ShooterIntakeMechanism(HardwareMap hardwareMap, Telemetry telemetry, AprilTag apriltag){
+        this.apriltag = apriltag;
+        huskyLens = hardwareMap.get(HuskyLens.class, "husky lens");
         huskyLens.selectAlgorithm(HuskyLens.Algorithm.COLOR_RECOGNITION);
-        intake = hardwareMap.get(DcMotor.class, "Intake");
-        shooter = hardwareMap.get(DcMotor.class, "Shooter");
-        angle = hardwareMap.get(DcMotor.class, "Angle");
-        angle.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        intake = hardwareMap.get(DcMotor.class, "intake");
+        intake.setDirection(DcMotor.Direction.REVERSE);
+        shooter = hardwareMap.get(DcMotor.class, "shooter");
+        angle = hardwareMap.get(DcMotor.class, "shooter angle");
+        sorter = hardwareMap.get(Servo.class, "sorter");
     }
 
     public void getHuskyLensData() {
@@ -60,7 +63,9 @@ public class ShooterIntakeMechanism {
                 greenBallDetected = false;
             }
 
-            telemetry.addData("Block " + i, "ID: " + blocks[i].id + " X: " + blocks[i].x + " Y: " + blocks[i].y + "Color: " + ballColor);
+            if(blocks[i].x <225){
+                telemetry.addData("Block " + i, "ID: " + blocks[i].id + " X: " + blocks[i].x + " Y: " + blocks[i].y + "Color: " + ballColor);
+            }
         }
 
         if (blocks.length == 0){
@@ -106,15 +111,14 @@ public class ShooterIntakeMechanism {
                 apriltag.faceRedAprilTag();
             }
         }
-        //if it is aligned, move on to find distance, set angle, and shoot
+        //if it is aligned, move on to find distance
         else {
-            if (apriltag.isBlueAligned) {
-                //apriltag.get distance from blue apriltag()
-                //angle.setTargetPosition(f(distance from apriltag));
-            } else {
-                //apriltag.get distance from red apriltag()
-                //angle.setTargetPosition(f(distance from apriltag));
+            if (apriltag.isBlueAligned && !apriltag.isAtTargetRange) {
+                apriltag.driveTowardsBlueApriltag();
+            } else if (apriltag.isRedAligned && !apriltag.isAtTargetRange) {
+                apriltag.driveTowardsRedApriltag();
             }
+            //if it is it at target range, shoot
             //if (pattern 1){
                 //green, purple, purple, complete
                 //if(complete)
@@ -131,6 +135,8 @@ public class ShooterIntakeMechanism {
                     //isShooterRunning = false;
             //}
         }
+
+
     }
 
     public void stopShooter () {
@@ -138,4 +144,14 @@ public class ShooterIntakeMechanism {
         apriltag.isRedAligned = false;
         angle.setTargetPosition(0);
     }
+
+
+    public void runShooterMotor(){
+        shooter.setPower(.64);
+    }
+
+    public void stopShooterMotor(){
+        shooter.setPower(0);
+    }
+
 }
