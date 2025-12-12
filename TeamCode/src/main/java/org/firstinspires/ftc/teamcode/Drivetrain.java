@@ -2,9 +2,9 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
+
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
@@ -13,10 +13,10 @@ public class Drivetrain {
     public DcMotor frontLeft, frontRight, backLeft, backRight;
     public Telemetry telemetry;
     public IMU imu;
-    public Gamepad gamepad1;
-    public Drivetrain(HardwareMap hardwareMap, Telemetry telemetry, Gamepad gamepad1) {
+    private double turnToAnglekP = 0.015;
+    private double turnToAngleErrorTolerance = 1;
+    public Drivetrain(HardwareMap hardwareMap, Telemetry telemetry) {
         this.telemetry = telemetry;
-        this.gamepad1 = gamepad1;
         // Initialize motors with the same names from configuration
         frontLeft = hardwareMap.get(DcMotor.class, "front-left-drive");
         backLeft = hardwareMap.get(DcMotor.class, "back-left-drive");
@@ -166,28 +166,6 @@ public class Drivetrain {
         backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
-    public void turnToAngle(double targetAngle, double power) {
-
-        double error = targetAngle - getHeading();
-
-        while (Math.abs(error) > 1) {   // stop when within ±1 degree
-            double turnPower = error * 0.015; // slow down as you get close
-            turnPower = Math.max(-power, Math.min(power, turnPower));
-
-            // turn robot
-            frontLeft.setPower(-turnPower);
-            backLeft.setPower(-turnPower);
-            frontRight.setPower(turnPower);
-            backRight.setPower(turnPower);
-
-            // recalc error
-            error = targetAngle - getHeading();
-        }
-
-        stop();
-    }
-
-
 
     public void strafeDistance(double inches, double power) {
         int ticksPerRev = 537; // adjust for your motor
@@ -220,22 +198,32 @@ public class Drivetrain {
         backLeft.setPower(power);
         backRight.setPower(power);
 
-        // Wait for completion
-        while (frontLeft.isBusy() && frontRight.isBusy() &&
-                backLeft.isBusy() && backRight.isBusy()) {
-            // optional telemetry
+        while (frontLeft.isBusy() & frontRight.isBusy()
+                & backLeft.isBusy() & backRight.isBusy() ) {
+        }
+        stop();
+    }
+
+    public void turnToAngle(double targetAngle, double power) {
+
+        double error = targetAngle - getHeading();
+
+        while (Math.abs(error) > turnToAngleErrorTolerance) {
+            double turnPower = error * turnToAnglekP; // slow down as you get close
+            turnPower = Math.max(-power, Math.min(power, turnPower));
+
+            // turn robot
+            frontLeft.setPower(-turnPower);
+            backLeft.setPower(-turnPower);
+            frontRight.setPower(turnPower);
+            backRight.setPower(turnPower);
+
+            // recalc error
+            error = targetAngle - getHeading();
         }
 
         stop();
-
-        // Return to normal mode
-        frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
-
-
     //for autonomous
     public void forward(double power){
         drive(power,0,0);
@@ -251,11 +239,14 @@ public class Drivetrain {
 
     public void stop() {
         drive(0, 0, 0);
+        frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
-    public void resetIMU() {
-        if (gamepad1.options) {
-            imu.resetYaw();
-        }
+    public void resetHeading() {
+        imu.resetYaw();
+
     }
 }

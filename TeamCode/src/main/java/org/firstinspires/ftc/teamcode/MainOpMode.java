@@ -14,7 +14,7 @@ public class MainOpMode extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        drivetrain = new Drivetrain(hardwareMap, telemetry, gamepad1);
+        drivetrain = new Drivetrain(hardwareMap, telemetry);
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
