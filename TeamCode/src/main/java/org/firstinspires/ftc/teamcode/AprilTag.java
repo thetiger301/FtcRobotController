@@ -9,7 +9,6 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 import java.util.List;
-
     public class AprilTag {
         private VisionPortal visionPortal;
         private AprilTagProcessor aprilTagProcessor;
@@ -30,8 +29,11 @@ import java.util.List;
         private double range = 0;
         private double targetRange = 0;
         public boolean isAtTargetRange;
-
-
+        public enum Pattern {
+            P_P_G,
+            P_G_P,
+            G_P_P
+        }
 
         public AprilTag(HardwareMap hardwareMap, Telemetry telemetry) {
             this.telemetry = telemetry;
@@ -39,6 +41,7 @@ import java.util.List;
             visionPortal = VisionPortal.easyCreateWithDefaults(hardwareMap.get(WebcamName.class, "Webcam 1"), aprilTagProcessor);
             drivetrain = new Drivetrain(hardwareMap, telemetry);
         }
+
         public void giveBearing() {
             AprilTagDetection targetTagRed = null;
             AprilTagDetection targetTagBlue = null;
@@ -218,8 +221,16 @@ import java.util.List;
             isBlueRangeFound = false;
             range = 0;
         }
-
+        public void detectPattern() {
+            List<AprilTagDetection> detections = aprilTagProcessor.getDetections();
+            for (AprilTagDetection tag : detections) {
+                if (tag.id == 21) {
+                    Pattern pattern = Pattern.P_P_G;
+                } else if (tag.id == 22) {
+                    Pattern pattern = Pattern.P_G_P;
+                } else if (tag.id == 23) {
+                    Pattern pattern = Pattern.G_P_P;
+                }
+            }
+        }
     }
-
-
-

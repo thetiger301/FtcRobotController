@@ -159,11 +159,7 @@ public class Drivetrain {
             // You can add telemetry here to show progress
         }
 
-        // Stop all motion
-        frontLeft.setPower(0);
-        frontRight.setPower(0);
-        backLeft.setPower(0);
-        backRight.setPower(0);
+        stop();
 
         // Return to encoder mode
         frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -176,8 +172,8 @@ public class Drivetrain {
 
         double error = targetAngle - getHeading();
 
-        while (Math.abs(error) > 10) {   // stop when within ±1 degree
-            double turnPower = error * 0.015; // slow down as you get close
+        while (Math.abs(error) > errorTolerance) {
+            double turnPower = error * kP; // slow down as you get close
             turnPower = Math.max(-power, Math.min(power, turnPower));
 
             // turn robot

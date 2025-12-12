@@ -153,5 +153,11 @@ public class ShooterIntakeMechanism {
     public void stopShooterMotor(){
         shooter.setPower(0);
     }
+    public void setIntakePower(double power) {
+        intake.setPower(power);
+    }
+    public void setSorterPosition(double position) {
+        sorter.setPosition(position);
+    }
 
 }
