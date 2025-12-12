@@ -1,7 +1,9 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.dfrobot.HuskyLens;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -17,18 +19,24 @@ public class ShooterIntakeMechanism {
 
     private DcMotor angle;
     private DcMotor shooter;
+    public CRServo whiteFeeder;
+    public CRServo grayFeeder;
     private String ballColor;
     private boolean purpleBallDetected;
     private boolean greenBallDetected;
     private double rollerPower = 0;
+    private double whiteRollerPower = 0;
     public boolean colorIsBlue;
     public boolean isIntakeRunning;
-    public boolean isShooterRunning;
+    public boolean isShootProcessRunning;
+    public boolean isWhiteFeederRunning;
+    public boolean isGrayFeederRunning;
     public boolean isShooterMotorRunning;
 
 
     public ShooterIntakeMechanism(HardwareMap hardwareMap, Telemetry telemetry, AprilTag apriltag){
         this.apriltag = apriltag;
+        this.telemetry = telemetry;
         huskyLens = hardwareMap.get(HuskyLens.class, "husky lens");
         huskyLens.selectAlgorithm(HuskyLens.Algorithm.COLOR_RECOGNITION);
         intake = hardwareMap.get(DcMotor.class, "intake");
@@ -36,6 +44,9 @@ public class ShooterIntakeMechanism {
         shooter = hardwareMap.get(DcMotor.class, "shooter");
         angle = hardwareMap.get(DcMotor.class, "shooter angle");
         sorter = hardwareMap.get(Servo.class, "sorter");
+        whiteFeeder = hardwareMap.get(CRServo.class, "white feeder");
+        whiteFeeder.setDirection(DcMotor.Direction.REVERSE);
+        grayFeeder = hardwareMap.get(CRServo.class, "gray feeder");
     }
 
     public void getHuskyLensData() {
@@ -99,7 +110,11 @@ public class ShooterIntakeMechanism {
         intake.setPower(rollerPower);
     }
 
-    public void runShooter() {
+    public void reverseIntake(){
+        intake.setPower(-1);
+    }
+
+    public void runShootProcess() {
         //if not aligned, align to apriltag
         if (!apriltag.isBlueAligned && !apriltag.isRedAligned) {
             //align for blue
@@ -112,13 +127,15 @@ public class ShooterIntakeMechanism {
             }
         }
         //if it is aligned, move on to find distance
-        else {
-            if (apriltag.isBlueAligned && !apriltag.isAtTargetRange) {
-                apriltag.driveTowardsBlueApriltag();
-            } else if (apriltag.isRedAligned && !apriltag.isAtTargetRange) {
-                apriltag.driveTowardsRedApriltag();
-            }
-            //if it is it at target range, shoot
+        if (apriltag.isBlueAligned && !apriltag.isAtTargetRange) {
+            apriltag.driveTowardsBlueApriltag();
+        } else if (apriltag.isRedAligned && !apriltag.isAtTargetRange) {
+            apriltag.driveTowardsRedApriltag();
+        }
+        //if it is it at target range, shoot
+        if (apriltag.isAtTargetRange){
+            telemetry.addLine("Ready to Shoot");
+        }
             //if (pattern 1){
                 //green, purple, purple, complete
                 //if(complete)
@@ -134,24 +151,45 @@ public class ShooterIntakeMechanism {
                 //if(complete)
                     //isShooterRunning = false;
             //}
-        }
 
 
     }
 
-    public void stopShooter () {
+    public void stopShootProcess () {
         apriltag.isBlueAligned = false;
         apriltag.isRedAligned = false;
-        angle.setTargetPosition(0);
+        apriltag.isAtTargetRange = false;
+        //angle.setTargetPosition(0);
     }
-
 
     public void runShooterMotor(){
         shooter.setPower(.64);
     }
 
-    public void stopShooterMotor(){
+    public void stopShooterMotor() {
         shooter.setPower(0);
     }
+
+    public void runWhiteFeeder(){
+        whiteFeeder.setPower(1);
+        whiteRollerPower = 0.3;
+    }
+
+    public void stopWhiteFeeder(){
+        whiteFeeder.setPower(0);
+        whiteRollerPower = 0;
+    }
+
+    public void runGrayFeeder(){
+        grayFeeder.setPower(1);
+        rollerPower = 0.3;
+    }
+
+    public void stopGrayFeeder(){
+        grayFeeder.setPower(0);
+        rollerPower = whiteRollerPower;
+    }
+
+
 
 }

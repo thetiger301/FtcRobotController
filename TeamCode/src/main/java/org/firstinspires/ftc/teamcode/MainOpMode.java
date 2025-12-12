@@ -10,29 +10,15 @@ public class MainOpMode extends LinearOpMode {
     // System Declarations
     public Drivetrain drivetrain;
     public AprilTag apriltag;
-    //public AprilTagProcessor aprilTagProcessor;
-    //public VisionPortal visionPortal;
     public ShooterIntakeMechanism shooterIntakeMechanism;
-    public boolean fieldOriented;
+    public boolean fieldOriented = true;
     public double axial, lateral, yaw;
-    public CRServo whiteFeeder;
-    public CRServo grayFeeder;
-
-
-
-
 
     @Override
     public void runOpMode() {
         drivetrain = new Drivetrain(hardwareMap, telemetry);
-        apriltag = new AprilTag(hardwareMap, telemetry);
-        //aprilTagProcessor = AprilTagProcessor.easyCreateWithDefaults();
-        //visionPortal = VisionPortal.easyCreateWithDefaults(hardwareMap.get(WebcamName.class, "Webcam 1"), aprilTagProcessor);
+        apriltag = new AprilTag(hardwareMap, telemetry, drivetrain);
         shooterIntakeMechanism = new ShooterIntakeMechanism(hardwareMap, telemetry, apriltag);
-        whiteFeeder = hardwareMap.get(CRServo.class, "white feeder");
-        grayFeeder = hardwareMap.get(CRServo.class, "gray feeder");
-
-
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -51,10 +37,11 @@ public class MainOpMode extends LinearOpMode {
             yaw = gamepad1.right_stick_x;
 
             // Field oriented drive toggle
-            if(gamepad1.aWasPressed()){
+            if(gamepad1.dpadDownWasPressed()){
                 fieldOriented = !fieldOriented;
             }
 
+            // Defaults to fieldOriented true
             if (fieldOriented) {
                 drivetrain.fieldOrientedDrive(axial, lateral, yaw);
                 telemetry.addData("Field Oriented Enabled", true);
@@ -74,7 +61,7 @@ public class MainOpMode extends LinearOpMode {
             }
 
             //turns the intake on and off
-            if (gamepad1.leftStickButtonWasPressed()){
+            if (gamepad1.aWasPressed()){
                 shooterIntakeMechanism.isIntakeRunning = !shooterIntakeMechanism.isIntakeRunning;
             }
             if (shooterIntakeMechanism.isIntakeRunning) {
@@ -86,18 +73,18 @@ public class MainOpMode extends LinearOpMode {
 
 
             //turns the shooter mechanism on and off
-            if(gamepad1.rightStickButtonWasPressed()){
-                shooterIntakeMechanism.isShooterRunning = !shooterIntakeMechanism.isShooterRunning;
+            if(gamepad1.bWasPressed()){
+                shooterIntakeMechanism.isShootProcessRunning = !shooterIntakeMechanism.isShootProcessRunning;
             }
-            if(shooterIntakeMechanism.isShooterRunning){
-                shooterIntakeMechanism.runShooter();
+            if(shooterIntakeMechanism.isShootProcessRunning){
+                shooterIntakeMechanism.runShootProcess();
             }
-            if(!shooterIntakeMechanism.isShooterRunning){
-                shooterIntakeMechanism.stopShooter();
+            if(!shooterIntakeMechanism.isShootProcessRunning){
+                shooterIntakeMechanism.stopShootProcess();
             }
 
             //turns the shooter motor on and off
-            if(gamepad2.aWasPressed()){
+            if(gamepad2.xWasPressed()){
                 shooterIntakeMechanism.isShooterMotorRunning = !shooterIntakeMechanism.isShooterMotorRunning;
             }
             if(shooterIntakeMechanism.isShooterMotorRunning){
@@ -107,17 +94,32 @@ public class MainOpMode extends LinearOpMode {
                 shooterIntakeMechanism.stopShooterMotor();
             }
 
-
-
-            if(gamepad2.b){
-                whiteFeeder.setPower(-1);
-                grayFeeder.setPower(1);
-            } else if (gamepad2.y){
-                whiteFeeder.setPower(0);
-                grayFeeder.setPower(0);
+            //turns the white feeder on and off
+            if(gamepad2.bWasPressed()){
+                shooterIntakeMechanism.isWhiteFeederRunning = !shooterIntakeMechanism.isWhiteFeederRunning;
+            }
+            if(shooterIntakeMechanism.isWhiteFeederRunning){
+                shooterIntakeMechanism.runWhiteFeeder();
+            }
+            if(!shooterIntakeMechanism.isWhiteFeederRunning){
+                shooterIntakeMechanism.stopWhiteFeeder();
             }
 
+            //turns the gray feeder on and off
+            if(gamepad2.aWasPressed()){
+                shooterIntakeMechanism.isGrayFeederRunning = !shooterIntakeMechanism.isGrayFeederRunning;
+            }
+            if(shooterIntakeMechanism.isGrayFeederRunning){
+                shooterIntakeMechanism.runGrayFeeder();
+            }
+            if(!shooterIntakeMechanism.isGrayFeederRunning){
+                shooterIntakeMechanism.stopGrayFeeder();
+            }
 
+            //tua
+            if (gamepad1.y){
+                shooterIntakeMechanism.reverseIntake();
+            }
 
             //give the bearing
             if (gamepad1.x) {

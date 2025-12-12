@@ -33,11 +33,11 @@ import java.util.List;
 
 
 
-        public AprilTag(HardwareMap hardwareMap, Telemetry telemetry) {
+        public AprilTag(HardwareMap hardwareMap, Telemetry telemetry, Drivetrain drivetrain) {
             this.telemetry = telemetry;
+            this.drivetrain = drivetrain;
             aprilTagProcessor = AprilTagProcessor.easyCreateWithDefaults();
             visionPortal = VisionPortal.easyCreateWithDefaults(hardwareMap.get(WebcamName.class, "Webcam 1"), aprilTagProcessor);
-            drivetrain = new Drivetrain(hardwareMap, telemetry);
         }
         public void giveBearing() {
             AprilTagDetection targetTagRed = null;
@@ -185,6 +185,7 @@ import java.util.List;
             if (isRedRangeFound){
                 targetRange = range - 41;
                 drivetrain.driveForwardDistance(targetRange, .5);
+                isAtTargetRange = true;
             }
             //return this variables to original state
             isRedRangeFound = false;
@@ -213,6 +214,7 @@ import java.util.List;
             if (isBlueRangeFound){
                 targetRange = range - 41;
                 drivetrain.driveForwardDistance(targetRange, .5);
+                isAtTargetRange = true;
             }
             //return this variables to original state
             isBlueRangeFound = false;
