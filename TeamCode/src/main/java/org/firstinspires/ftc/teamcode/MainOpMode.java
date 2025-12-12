@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
 
 @TeleOp(name="Main OpMode")
 public class MainOpMode extends LinearOpMode {
@@ -9,15 +10,15 @@ public class MainOpMode extends LinearOpMode {
     // System Declarations
     public Drivetrain drivetrain;
     public AprilTag apriltag;
-    public boolean fieldOriented;
+    public ShooterIntakeMechanism shooterIntakeMechanism;
+    public boolean fieldOriented = true;
     public double axial, lateral, yaw;
-    public boolean ColorIsBlue;
-
 
     @Override
     public void runOpMode() {
         drivetrain = new Drivetrain(hardwareMap, telemetry);
-        apriltag = new AprilTag(hardwareMap, telemetry);
+        apriltag = new AprilTag(hardwareMap, telemetry, drivetrain);
+        shooterIntakeMechanism = new ShooterIntakeMechanism(hardwareMap, telemetry, apriltag);
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -36,10 +37,11 @@ public class MainOpMode extends LinearOpMode {
             yaw = gamepad1.right_stick_x;
 
             // Field oriented drive toggle
-            if(gamepad1.aWasPressed()){
+            if(gamepad1.dpadDownWasPressed()){
                 fieldOriented = !fieldOriented;
             }
 
+            // Defaults to fieldOriented true
             if (fieldOriented) {
                 drivetrain.fieldOrientedDrive(axial, lateral, yaw);
                 telemetry.addData("Field Oriented Enabled", true);
@@ -50,40 +52,78 @@ public class MainOpMode extends LinearOpMode {
 
             //Set Alliance Color
             if (gamepad1.dpadLeftWasPressed()){
-                ColorIsBlue = !ColorIsBlue;
+                shooterIntakeMechanism.colorIsBlue = !shooterIntakeMechanism.colorIsBlue;
+            }
+            if (shooterIntakeMechanism.colorIsBlue) {
+                telemetry.addLine("Alliance Color Blue");
+            } else{
+                telemetry.addLine("Alliance Color Red");
             }
 
-            if (ColorIsBlue) {
-                telemetry.addLine("Alliance Color is BLue");
-
-            } else if (!ColorIsBlue) {
-                telemetry.addLine("Alliance Color is Red");
+            //turns the intake on and off
+            if (gamepad1.aWasPressed()){
+                shooterIntakeMechanism.isIntakeRunning = !shooterIntakeMechanism.isIntakeRunning;
+            }
+            if (shooterIntakeMechanism.isIntakeRunning) {
+                shooterIntakeMechanism.runIntake();
+            }
+            if(!shooterIntakeMechanism.isIntakeRunning){
+                shooterIntakeMechanism.stopIntake();
             }
 
-            if(gamepad1.leftBumperWasPressed()){
-                if(ColorIsBlue){
-                    apriltag.turningTowardsBlueApriltag = true;
-                }
-                else{
-                    apriltag.turningTowardsRedApriltag = true;
-                }
+
+            //turns the shooter mechanism on and off
+            if(gamepad1.bWasPressed()){
+                shooterIntakeMechanism.isShootProcessRunning = !shooterIntakeMechanism.isShootProcessRunning;
+            }
+            if(shooterIntakeMechanism.isShootProcessRunning){
+                shooterIntakeMechanism.runShootProcess();
+            }
+            if(!shooterIntakeMechanism.isShootProcessRunning){
+                shooterIntakeMechanism.stopShootProcess();
             }
 
-            //Align to apriltag
-            if (apriltag.turningTowardsBlueApriltag) {
-                apriltag.faceBlueAprilTag();
+            //turns the shooter motor on and off
+            if(gamepad2.xWasPressed()){
+                shooterIntakeMechanism.isShooterMotorRunning = !shooterIntakeMechanism.isShooterMotorRunning;
             }
-            if(apriltag.turningTowardsRedApriltag){
-                apriltag.faceRedAprilTag();
+            if(shooterIntakeMechanism.isShooterMotorRunning){
+                shooterIntakeMechanism.runShooterMotor();
             }
+            if(!shooterIntakeMechanism.isShooterMotorRunning){
+                shooterIntakeMechanism.stopShooterMotor();
+            }
+
+            //turns the white feeder on and off
+            if(gamepad2.bWasPressed()){
+                shooterIntakeMechanism.isWhiteFeederRunning = !shooterIntakeMechanism.isWhiteFeederRunning;
+            }
+            if(shooterIntakeMechanism.isWhiteFeederRunning){
+                shooterIntakeMechanism.runWhiteFeeder();
+            }
+            if(!shooterIntakeMechanism.isWhiteFeederRunning){
+                shooterIntakeMechanism.stopWhiteFeeder();
+            }
+
+            //turns the gray feeder on and off
+            if(gamepad2.aWasPressed()){
+                shooterIntakeMechanism.isGrayFeederRunning = !shooterIntakeMechanism.isGrayFeederRunning;
+            }
+            if(shooterIntakeMechanism.isGrayFeederRunning){
+                shooterIntakeMechanism.runGrayFeeder();
+            }
+            if(!shooterIntakeMechanism.isGrayFeederRunning){
+                shooterIntakeMechanism.stopGrayFeeder();
+            }
+
+            //tua
+            if (gamepad1.y){
+                shooterIntakeMechanism.reverseIntake();
+            }
+
+            //give the bearing
             if (gamepad1.x) {
                 apriltag.giveBearing();
-            }
-
-            //override all aligning
-            if(gamepad1.rightBumperWasPressed()){
-                apriltag.turningTowardsBlueApriltag = false;
-                apriltag.turningTowardsRedApriltag = false;
             }
 
             //Reset robot heading
