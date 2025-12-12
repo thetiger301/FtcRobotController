@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.hardware.dfrobot.HuskyLens;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -64,7 +63,7 @@ public class ShooterIntakeMechanism {
                 purpleBallDetected = true;
                 greenBallDetected = false;
                 break;
-            } else if (blocks[i].id == 2 && blocks[i].x < 225) {
+            } else if (blocks[i].id == 2 && blocks[i].x < 225 && blocks[i].x > 40) {
                 ballColor = "Green";
                 greenBallDetected = true;
                 purpleBallDetected = false;
@@ -163,7 +162,7 @@ public class ShooterIntakeMechanism {
     }
 
     public void runShooterMotor(){
-        shooter.setPower(.64);
+        shooter.setPower(.8);
     }
 
     public void stopShooterMotor() {
@@ -172,7 +171,7 @@ public class ShooterIntakeMechanism {
 
     public void runWhiteFeeder(){
         whiteFeeder.setPower(1);
-        whiteRollerPower = 0.3;
+        whiteRollerPower = 0.5;
     }
 
     public void stopWhiteFeeder(){
@@ -182,7 +181,7 @@ public class ShooterIntakeMechanism {
 
     public void runGrayFeeder(){
         grayFeeder.setPower(1);
-        rollerPower = 0.3;
+        rollerPower = 0.5;
     }
 
     public void stopGrayFeeder(){

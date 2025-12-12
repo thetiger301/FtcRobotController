@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.CRServo;
 
 @TeleOp(name="Main OpMode")
 public class MainOpMode extends LinearOpMode {
@@ -129,6 +128,15 @@ public class MainOpMode extends LinearOpMode {
             //Reset robot heading
             if(gamepad1.dpadUpWasPressed()){
                 drivetrain.resetIMU();
+            }
+
+            //Kill Everything
+            if(gamepad2.yWasPressed()){
+                shooterIntakeMechanism.stopWhiteFeeder();
+                shooterIntakeMechanism.stopGrayFeeder();
+                shooterIntakeMechanism.stopIntake();
+                shooterIntakeMechanism.stopShootProcess();
+                shooterIntakeMechanism.stopShooterMotor();
             }
 
             telemetry.addData("Status", "Running");
