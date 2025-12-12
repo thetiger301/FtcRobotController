@@ -29,6 +29,8 @@ import java.util.List;
         private double range = 0;
         private double targetRange = 0;
         public boolean isAtTargetRange;
+        public boolean isPatternFound;
+
         public enum Pattern {
             P_P_G,
             P_G_P,
@@ -131,11 +133,11 @@ import java.util.List;
             bearing = 0;
         }
 
-        public void faceRedAprilTag(){
+        public void faceRedAprilTag() {
             telemetry.addLine("move to red");
             AprilTagDetection targetTagRed = null;
             //scan for tag information while the bearing is unknown
-            if(!redBearingIsFound) {
+            if (!redBearingIsFound) {
                 List<AprilTagDetection> detections = aprilTagProcessor.getDetections();
                 for (AprilTagDetection tag : detections) {
                     if (tag.id == 24) {
@@ -144,7 +146,7 @@ import java.util.List;
                 }
             }
             //if the tag information is not found, move 30 degree left
-            if(targetTagRed == null){
+            if (targetTagRed == null) {
                 drivetrain.turnThisManyDegrees(-20, .5);
             }
             //once the tag information is found, it will stop scanning
@@ -153,7 +155,7 @@ import java.util.List;
                 bearing = targetTagRed.ftcPose.bearing;
             }
             //move as many degrees as the bearing
-            if (redBearingIsFound){
+            if (redBearingIsFound) {
                 if (Math.abs(bearing) > 2) {
                     double targetAngle = bearing;
                     drivetrain.turnThisManyDegrees(targetAngle, .5);
@@ -167,11 +169,11 @@ import java.util.List;
             bearing = 0;
         }
 
-        public void driveTowardsRedApriltag(){
+        public void driveTowardsRedApriltag() {
             telemetry.addLine("move to red");
             AprilTagDetection targetTagRed = null;
             //scan for tag information while the bearing is unknown
-            if(!isRedRangeFound) {
+            if (!isRedRangeFound) {
                 List<AprilTagDetection> detections = aprilTagProcessor.getDetections();
                 for (AprilTagDetection tag : detections) {
                     if (tag.id == 24) {
@@ -185,7 +187,7 @@ import java.util.List;
                 range = targetTagRed.ftcPose.range;
             }
             //move forward or backward to target range
-            if (isRedRangeFound){
+            if (isRedRangeFound) {
                 targetRange = range - 41;
                 drivetrain.driveForwardDistance(targetRange, .5);
             }
@@ -195,11 +197,11 @@ import java.util.List;
         }
 
 
-        public void driveTowardsBlueApriltag(){
+        public void driveTowardsBlueApriltag() {
             telemetry.addLine("move to red");
             AprilTagDetection targetTagBlue = null;
             //scan for tag information while the bearing is unknown
-            if(!isBlueRangeFound) {
+            if (!isBlueRangeFound) {
                 List<AprilTagDetection> detections = aprilTagProcessor.getDetections();
                 for (AprilTagDetection tag : detections) {
                     if (tag.id == 20) {
@@ -213,7 +215,7 @@ import java.util.List;
                 range = targetTagBlue.ftcPose.range;
             }
             //move forward or backward to target range
-            if (isBlueRangeFound){
+            if (isBlueRangeFound) {
                 targetRange = range - 41;
                 drivetrain.driveForwardDistance(targetRange, .5);
             }
@@ -221,15 +223,19 @@ import java.util.List;
             isBlueRangeFound = false;
             range = 0;
         }
+
         public void detectPattern() {
             List<AprilTagDetection> detections = aprilTagProcessor.getDetections();
             for (AprilTagDetection tag : detections) {
                 if (tag.id == 21) {
                     Pattern pattern = Pattern.P_P_G;
+                    isPatternFound = true;
                 } else if (tag.id == 22) {
                     Pattern pattern = Pattern.P_G_P;
+                    isPatternFound = true;
                 } else if (tag.id == 23) {
                     Pattern pattern = Pattern.G_P_P;
+                    isPatternFound = true;
                 }
             }
         }

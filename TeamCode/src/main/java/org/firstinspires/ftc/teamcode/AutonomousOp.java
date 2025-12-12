@@ -35,9 +35,9 @@ public class AutonomousOp extends LinearOpMode {
             sleep(500);
             apriltag.detectPattern();
             drivetrain.turnToAngle(-55,.6);
+            sleep(1000);
             switch (pattern) {
                 case G_P_P:
-
                     break;
                 case P_G_P:
                     break;
@@ -62,6 +62,7 @@ public class AutonomousOp extends LinearOpMode {
 
             drivetrain.strafeDistance(22, .8);
             drivetrain.turnToAngle(-55, .6);
+            sleep(1000);
 
             //shoot
             switch (pattern) {
