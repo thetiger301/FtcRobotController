@@ -164,11 +164,11 @@ public class ShooterIntakeMechanism {
     }
 
     public void runShooterMotor(){
-        shooter.setPower(.7);
+        shooter.setPower(.6);
     }
 
     public void runAutoShooterMotor(){
-        shooter.setPower(.7);
+        shooter.setPower(.6);
     }
 
     public void stopShooterMotor() {
