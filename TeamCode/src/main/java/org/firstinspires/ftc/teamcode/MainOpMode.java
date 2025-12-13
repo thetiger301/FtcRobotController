@@ -15,7 +15,7 @@ public class MainOpMode extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        drivetrain = new Drivetrain(hardwareMap, telemetry);
+        drivetrain = new Drivetrain(hardwareMap, telemetry, gamepad1);
         apriltag = new AprilTag(hardwareMap, telemetry, drivetrain);
         shooterIntakeMechanism = new ShooterIntakeMechanism(hardwareMap, telemetry, apriltag);
 
@@ -94,24 +94,18 @@ public class MainOpMode extends LinearOpMode {
             }
 
             //turns the white feeder on and off
-            if(gamepad2.bWasPressed()){
-                shooterIntakeMechanism.isWhiteFeederRunning = !shooterIntakeMechanism.isWhiteFeederRunning;
-            }
-            if(shooterIntakeMechanism.isWhiteFeederRunning){
+            if(gamepad2.b){
                 shooterIntakeMechanism.runWhiteFeeder();
             }
-            if(!shooterIntakeMechanism.isWhiteFeederRunning){
+            else{
                 shooterIntakeMechanism.stopWhiteFeeder();
             }
 
             //turns the gray feeder on and off
-            if(gamepad2.aWasPressed()){
-                shooterIntakeMechanism.isGrayFeederRunning = !shooterIntakeMechanism.isGrayFeederRunning;
-            }
-            if(shooterIntakeMechanism.isGrayFeederRunning){
+            if(gamepad2.a){
                 shooterIntakeMechanism.runGrayFeeder();
             }
-            if(!shooterIntakeMechanism.isGrayFeederRunning){
+            else{
                 shooterIntakeMechanism.stopGrayFeeder();
             }
 

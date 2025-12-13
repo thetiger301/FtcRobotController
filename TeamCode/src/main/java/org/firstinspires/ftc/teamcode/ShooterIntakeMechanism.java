@@ -16,7 +16,7 @@ public class ShooterIntakeMechanism {
     private Servo sorter;
     private DcMotor intake;
 
-    private DcMotor angle;
+    // private DcMotor angle;
     private DcMotor shooter;
     public CRServo whiteFeeder;
     public CRServo grayFeeder;
@@ -41,7 +41,7 @@ public class ShooterIntakeMechanism {
         intake = hardwareMap.get(DcMotor.class, "intake");
         intake.setDirection(DcMotor.Direction.REVERSE);
         shooter = hardwareMap.get(DcMotor.class, "shooter");
-        angle = hardwareMap.get(DcMotor.class, "shooter angle");
+        // angle = hardwareMap.get(DcMotor.class, "shooter angle");
         sorter = hardwareMap.get(Servo.class, "sorter");
         whiteFeeder = hardwareMap.get(CRServo.class, "white feeder");
         whiteFeeder.setDirection(DcMotor.Direction.REVERSE);
@@ -102,11 +102,13 @@ public class ShooterIntakeMechanism {
     public void runIntake(){
         moveSorter();
         intake.setPower(1);
+        whiteFeeder.setPower(-1);
     }
 
     public void stopIntake(){
         restSorter();
         intake.setPower(rollerPower);
+        //whiteFeeder.setPower();
     }
 
     public void reverseIntake(){
@@ -162,7 +164,11 @@ public class ShooterIntakeMechanism {
     }
 
     public void runShooterMotor(){
-        shooter.setPower(.8);
+        shooter.setPower(.7);
+    }
+
+    public void runAutoShooterMotor(){
+        shooter.setPower(.7);
     }
 
     public void stopShooterMotor() {
@@ -189,6 +195,27 @@ public class ShooterIntakeMechanism {
         rollerPower = whiteRollerPower;
     }
 
+    public void setSorterPosition (double position) {
+        sorter.setPosition(position);
+    }
 
+    public void autoWhiteFeeder(double power) {
+        whiteFeeder.setPower(power);
+    }
 
+    public void autoGrayFeeder(double power) {
+        grayFeeder.setPower(power);
+    }
+
+    public void autoIntake(double power) {
+        intake.setPower(power);
+    }
+
+    public void setSafePower(DcMotor motor, double targetPower) {
+        final double SLEW_RATE = 0.2;
+        double currentPower = motor.getPower();
+        double desiredChange = targetPower - currentPower;
+        double limitedChange = Math.max(-SLEW_RATE, Math.min(desiredChange, SLEW_RATE));
+        motor.setPower(currentPower += limitedChange);
+    }
 }

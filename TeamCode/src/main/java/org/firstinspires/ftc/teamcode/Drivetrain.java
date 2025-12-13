@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 
@@ -12,11 +13,13 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 public class Drivetrain {
     private DcMotor frontLeft, frontRight, backLeft, backRight;
     private Telemetry telemetry;
+    private Gamepad gamepad1;
     private IMU imu;
     private double kP = 0.04;
     private double errorTolerance = 2;
-    public Drivetrain(HardwareMap hardwareMap, Telemetry telemetry) {
+    public Drivetrain(HardwareMap hardwareMap, Telemetry telemetry, Gamepad gamepad1) {
         this.telemetry = telemetry;
+        this.gamepad1 = gamepad1;
 
         // Initialize motors with the same names from configuration
         frontLeft = hardwareMap.get(DcMotor.class, "front-left-drive");
@@ -181,9 +184,10 @@ public class Drivetrain {
             turnPower = Math.max(-power, Math.min(power, turnPower));
 
             // turn robot
+
             frontLeft.setPower(-turnPower);
-            backLeft.setPower(-turnPower);
             frontRight.setPower(turnPower);
+            backLeft.setPower(-turnPower);
             backRight.setPower(turnPower);
 
             // recalc error
@@ -206,8 +210,8 @@ public class Drivetrain {
 
             // turn robot
             frontLeft.setPower(-turnPower);
-            backLeft.setPower(-turnPower);
             frontRight.setPower(turnPower);
+            backLeft.setPower(-turnPower);
             backRight.setPower(turnPower);
 
             // recalc error
@@ -219,6 +223,9 @@ public class Drivetrain {
             }
             error = targetHeading - getHeading();
 
+            if (gamepad1.rightStickButtonWasPressed()) {
+                break;
+            }
         }
 
         stop();
@@ -285,5 +292,13 @@ public class Drivetrain {
 
     public void stop() {
         drive(0, 0, 0);
+    }
+
+    public void setSafePower(DcMotor motor, double targetPower) {
+        final double SLEW_RATE = 0.2;
+        double currentPower = motor.getPower();
+        double desiredChange = targetPower - currentPower;
+        double limitedChange = Math.max(-SLEW_RATE, Math.min(desiredChange, SLEW_RATE));
+        motor.setPower(currentPower += limitedChange);
     }
 }

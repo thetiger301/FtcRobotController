@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -16,6 +17,7 @@ import java.util.List;
 
         private Telemetry telemetry;
         private HardwareMap hardwareMap;
+        private Gamepad gamepad1;
         private Drivetrain drivetrain;
         public boolean turningTowardsBlueApriltag = false;
         public boolean turningTowardsRedApriltag = false;
@@ -30,8 +32,9 @@ import java.util.List;
         private double range = 0;
         private double targetRange = 0;
         public boolean isAtTargetRange;
-
-
+        //public Pattern pattern = null;
+        public boolean isPatternDetected;
+        public int pattern = -1;
 
         public AprilTag(HardwareMap hardwareMap, Telemetry telemetry, Drivetrain drivetrain) {
             this.telemetry = telemetry;
@@ -104,9 +107,9 @@ import java.util.List;
                 }
             }
 
-            //if the tag information is not found, move 30 degree left
+            //if the tag information is not found, move 20 degree left
             if (targetTagBlue == null) {
-                drivetrain.turnThisManyDegrees(20, .5);
+                drivetrain.turnThisManyDegrees(20, .3);
             }
             //once the tag information is found, it will stop scanning
             if (targetTagBlue != null) {
@@ -115,9 +118,9 @@ import java.util.List;
             }
             //move as many degrees as the bearing
             if (blueBearingIsFound) {
-                if (Math.abs(bearing) > 2) {
+                if (Math.abs(bearing) > 10) {
                     double targetAngle = bearing;
-                    drivetrain.turnThisManyDegrees(targetAngle, .5);
+                    drivetrain.turnThisManyDegrees(targetAngle, .3);
                 } else {
                     turningTowardsBlueApriltag = false; //Terminates the method once it has aligned to the tag
                     isBlueAligned = true;
@@ -140,9 +143,9 @@ import java.util.List;
                     }
                 }
             }
-            //if the tag information is not found, move 30 degree left
+            //if the tag information is not found, move 20 degree left
             if(targetTagRed == null){
-                drivetrain.turnThisManyDegrees(-20, .5);
+                drivetrain.turnThisManyDegrees(-20, .3);
             }
             //once the tag information is found, it will stop scanning
             if (targetTagRed != null) {
@@ -151,14 +154,15 @@ import java.util.List;
             }
             //move as many degrees as the bearing
             if (redBearingIsFound){
-                if (Math.abs(bearing) > 2) {
+                if (Math.abs(bearing) > 10) {
                     double targetAngle = bearing;
-                    drivetrain.turnThisManyDegrees(targetAngle, .5);
+                    drivetrain.turnThisManyDegrees(targetAngle, .3);
                 } else {
                     isRedAligned = true;
                     turningTowardsRedApriltag = false; //Terminates the method once it has aligned to the tag
                 }
             }
+
             //return this variables to original state
             redBearingIsFound = false;
             bearing = 0;
@@ -220,8 +224,22 @@ import java.util.List;
             isBlueRangeFound = false;
             range = 0;
         }
-
+        public void detectPattern() {
+            List<AprilTagDetection> detections = aprilTagProcessor.getDetections();
+            for (AprilTagDetection tag : detections) {
+                if (tag.id == 21) {
+                    pattern = 0;
+                    isPatternDetected = true;
+                } else if (tag.id == 22) {
+                    pattern = 1;
+                    isPatternDetected = true;
+                } else if (tag.id == 23) {
+                    pattern = 2;
+                    isPatternDetected = true;
+                }
+            }
+            if (!isPatternDetected){
+                pattern = 0;
+            }
+        }
     }
-
-
-
