@@ -28,9 +28,9 @@ public class BlueFrontAuto extends LinearOpMode {
             telemetry.update();
 
             shooterIntakeMechanism.runAutoShooterMotor();
-            drivetrain.driveForwardDistance(-41, 0.8);
+            drivetrain.driveForwardDistance(-24, 0.8);
             sleep(300);
-            drivetrain.turnToAngle(-70,.6);
+            //drivetrain.turnToAngle(-70,.6);
             sleep(500);
             apriltag.detectPattern();
             sleep(100);
@@ -40,7 +40,7 @@ public class BlueFrontAuto extends LinearOpMode {
             sleep(100);
             apriltag.detectPattern();
             sleep(100);
-            drivetrain.turnToAngle(0,.6);
+            //drivetrain.turnToAngle(0,.6);
             sleep(800);
             //apriltag.faceBlueAprilTag();
             //sleep(200);
@@ -57,7 +57,7 @@ public class BlueFrontAuto extends LinearOpMode {
                     shooterIntakeMechanism.autoWhiteFeeder(0);
                     sleep(1000);
                     shooterIntakeMechanism.autoWhiteFeeder(1);
-                    sleep(4000);
+                    sleep(6000);
                     shooterIntakeMechanism.autoGrayFeeder(0);
                     shooterIntakeMechanism.autoWhiteFeeder(0);
                     shooterIntakeMechanism.autoIntake(0);
@@ -94,7 +94,7 @@ public class BlueFrontAuto extends LinearOpMode {
             }
 
 
-            drivetrain.turnToAngle(-110,.6);
+            //drivetrain.turnToAngle(-110,.6);
                 /*drivetrain.strafeDistance(-22, .8);
 
                 shooterIntakeMechanism.autoIntake(1);
