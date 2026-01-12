@@ -11,11 +11,16 @@ public class MainOpMode extends LinearOpMode {
     public AprilTag aprilTag;
     public boolean fieldOriented = true;
     public double axial, lateral, yaw;
+    public enum RobotState{
+        MANUAL,
+        INTAKE,
+        SCORE
+    }
+    public RobotState robotState = RobotState.MANUAL;
 
     @Override
     public void runOpMode() {
         drivetrain = new Drivetrain(hardwareMap, telemetry);
-
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
