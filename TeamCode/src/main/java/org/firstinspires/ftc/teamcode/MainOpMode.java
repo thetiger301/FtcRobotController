@@ -7,49 +7,83 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 public class MainOpMode extends LinearOpMode {
 
     // System Declarations
-    public Drivetrain drivetrain;
-    public AprilTag aprilTag;
-    public boolean fieldOriented = true;
-    public double axial, lateral, yaw;
+    public Shooter shooter;
+    public boolean powerOn = false;
+    public double [] stepSizes = {10, 1, 0.1, 0.01, 0.001};
+    public int stepIndex = 1;
+    public double F = 10;
+    public double P = 0;
+    public int highVelocity = 2500;
+    public int lowVelocity = 1000;
+    public int curTargetVelocity = 0;
+
 
     @Override
     public void runOpMode() {
-        drivetrain = new Drivetrain(hardwareMap, telemetry);
-
+        shooter = new Shooter(hardwareMap, F, P);
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
-        drivetrain.resetIMU();
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-            // Competition Program
 
-            //Drivetrain control
-            axial = -gamepad1.left_stick_y;
-            lateral = gamepad1.left_stick_x;
-            yaw = gamepad1.right_stick_x;
-
-            // Field oriented drive toggle
-            if(gamepad1.dpadDownWasPressed()){
-                fieldOriented = !fieldOriented;
+            if (gamepad1.xWasPressed()) {
+                stepIndex = (stepIndex + 1) % stepSizes.length;
             }
 
-            // Defaults to fieldOriented true
-            if (fieldOriented) {
-                drivetrain.fieldOrientedDrive(axial, lateral, yaw);
-                telemetry.addData("Field Oriented Enabled", true);
-            } else if (!fieldOriented) {
-                drivetrain.drive(axial, lateral, yaw);
-                telemetry.addData("Field Oriented Enabled", false);
+            if (gamepad1.dpadRightWasPressed()) {
+                F += stepSizes[stepIndex];
             }
+
+            if (gamepad1.dpadRightWasPressed()) {
+                F -= stepSizes[stepIndex];
+            }
+
+            if (gamepad1.dpadUpWasPressed()) {
+                P += stepSizes[stepIndex];
+            }
+
+            if (gamepad1.dpadDownWasPressed()) {
+                P -= stepSizes[stepIndex];
+            }
+
+            if (gamepad1.rightBumperWasPressed()) {
+                curTargetVelocity = highVelocity;
+            }
+
+            if (gamepad1.leftBumperWasPressed()) {
+                curTargetVelocity = lowVelocity;
+            }
+
+
+            if (gamepad1.aWasPressed()) {
+                if (!powerOn) {
+                    shooter.setShooterPower(1);
+                    powerOn = true;
+                } else if(powerOn) {
+                    shooter.setShooterPower(0);
+                    powerOn = false;
+                }
+            }
+
+            if (gamepad1.bWasPressed()) {
+                shooter.setShooterAnglePosition(0);
+            } else if (gamepad1.yWasPressed()) {
+                shooter.setShooterAnglePosition(0.5);
+            }
+
+            shooter.setShooterVelocity(curTargetVelocity, P, F);
+
+            telemetry.addData("Current Velocity", shooter.getShooterVelocity());
+            telemetry.addData("Step Size", stepSizes[stepIndex]);
+            telemetry.addData("F Coefficient", F);
+            telemetry.addData("P Coefficient", P);
 
             telemetry.addData("Status", "Running");
-            telemetry.addData("Inputs", "axial: %.2f, lateral: %.2f, yaw: %.2f", axial, lateral, yaw);
-            telemetry.addData("Heading", drivetrain.getHeading());
             telemetry.update();
         }
     }
