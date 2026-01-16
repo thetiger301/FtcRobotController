@@ -158,4 +158,14 @@
 
     <!-- ======================================================================================= -->
 
+    <!-- Arducam OV9281, Calibrated by Alex Traeger, 2026.01.16 using 3DF Zephyr -->
+    <!--<Camera vid="0x0C45" pid="0x6366">
+        <Calibration
+            size="640 480"
+            focalLength="543.164f, 543.164f"
+            principalPoint="325.548f, 251.0595f"
+            distortionCoefficients="0.0637159, -0.128584, -0.0017158, -0.0029405, 0.0770816, 0, 0, 0"
+            />
+    </Camera> -->
+
 </Calibrations>
