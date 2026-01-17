@@ -8,19 +8,15 @@ public class MainOpMode extends LinearOpMode {
 
     // System Declarations
     public Shooter shooter;
-    public boolean powerOn = false;
-    public double [] stepSizes = {10, 1, 0.1, 0.01, 0.001};
+    public double [] stepSizes = {1, 0.1, 0.01, 0.001, 0.0001};
     public int stepIndex = 1;
-    public double F = 10;
-    public double P = 0;
-    public int highVelocity = 2500;
+    public int highVelocity = 1800;
     public int lowVelocity = 1000;
     public int curTargetVelocity = 0;
 
-
     @Override
     public void runOpMode() {
-        shooter = new Shooter(hardwareMap, F, P);
+        shooter = new Shooter(hardwareMap);
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -36,52 +32,62 @@ public class MainOpMode extends LinearOpMode {
             }
 
             if (gamepad1.dpadRightWasPressed()) {
-                F += stepSizes[stepIndex];
+                shooter.kPUp(stepSizes[stepIndex]);
             }
 
-            if (gamepad1.dpadRightWasPressed()) {
-                F -= stepSizes[stepIndex];
+            if (gamepad1.dpadLeftWasPressed()) {
+                shooter.kPDown(stepSizes[stepIndex]);
             }
 
             if (gamepad1.dpadUpWasPressed()) {
-                P += stepSizes[stepIndex];
+                shooter.motorPowerUp(stepSizes[stepIndex]);
             }
 
             if (gamepad1.dpadDownWasPressed()) {
-                P -= stepSizes[stepIndex];
+                shooter.motorPowerDown(stepSizes[stepIndex]);
             }
 
             if (gamepad1.rightBumperWasPressed()) {
                 curTargetVelocity = highVelocity;
+                shooter.resetPIDVelocity();
             }
 
             if (gamepad1.leftBumperWasPressed()) {
                 curTargetVelocity = lowVelocity;
+                shooter.resetPIDVelocity();
             }
 
+            shooter.motorPower = shooter.shooterPIDVelocity(curTargetVelocity, shooter.getShooterVelocity());
+            shooter.setShooterPower(shooter.motorPower);
 
-            if (gamepad1.aWasPressed()) {
-                if (!powerOn) {
-                    shooter.setShooterPower(1);
-                    powerOn = true;
-                } else if(powerOn) {
-                    shooter.setShooterPower(0);
-                    powerOn = false;
-                }
-            }
-
+            
             if (gamepad1.bWasPressed()) {
                 shooter.setShooterAnglePosition(0);
             } else if (gamepad1.yWasPressed()) {
                 shooter.setShooterAnglePosition(0.5);
             }
 
-            shooter.setShooterVelocity(curTargetVelocity, P, F);
+
+            if (gamepad1.right_stick_button) {
+                shooter.setIntakePower(1);
+            } else {
+                shooter.setIntakePower(0);
+            }
+
+            if (gamepad1.right_trigger > 0.05) {
+                shooter.shoot(0.35);
+            } else {
+                shooter.shoot(1);
+            }
+
+            shooter.setShooterFeeder(1);
 
             telemetry.addData("Current Velocity", shooter.getShooterVelocity());
+            telemetry.addData("Velocity Error", shooter.velocityError);
             telemetry.addData("Step Size", stepSizes[stepIndex]);
-            telemetry.addData("F Coefficient", F);
-            telemetry.addData("P Coefficient", P);
+            telemetry.addData("Shooter Motor", shooter.motorPower);
+            telemetry.addData("P Coefficient", shooter.kP);
+            telemetry.addData("I Coefficient", shooter.kI);
 
             telemetry.addData("Status", "Running");
             telemetry.update();
