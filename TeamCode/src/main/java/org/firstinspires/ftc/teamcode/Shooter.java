@@ -15,7 +15,7 @@ public class Shooter {
     private CRServo shooterFeeder1;
     private CRServo shooterFeeder2;
     private DcMotorEx intake;
-    private double lastVelocityError = 0;
+    private double lastVelocity = 0;
     public double velocityError = 0;
     private double derivative = 0;
     private double integralSum = 0;
@@ -74,7 +74,7 @@ public class Shooter {
         velocityError = commandedVelocity - currentVelocity;
 
         // Derivative
-        derivative = (velocityError - lastVelocityError) / dt;
+        derivative = (currentVelocity - lastVelocity) / dt;
 
         //Integral
         integralSum = integralSum + (velocityError * dt);
@@ -88,7 +88,7 @@ public class Shooter {
 
         double output = (kP * velocityError) + (kD * derivative) + (kI * integralSum) + (feedFoward);
 
-        lastVelocityError = velocityError;
+        lastVelocity = currentVelocity;
         shooterPIDTimer.reset();
 
         double finalOutput = Range.clip(output, -1, 1);
