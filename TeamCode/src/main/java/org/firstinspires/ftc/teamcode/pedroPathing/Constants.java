@@ -12,7 +12,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class Constants {
     public static FollowerConstants followerConstants = new FollowerConstants()
-            .mass(10);
+            .mass(5);
 
     public static MecanumConstants driveConstants = new MecanumConstants()
             .maxPower(1)
@@ -20,10 +20,10 @@ public class Constants {
             .rightRearMotorName("back-right-drive")
             .leftRearMotorName("back-left-drive")
             .leftFrontMotorName("front-right-drive")
-            .leftFrontMotorDirection(DcMotorSimple.Direction.REVERSE)
-            .leftRearMotorDirection(DcMotorSimple.Direction.FORWARD)
-            .rightFrontMotorDirection(DcMotorSimple.Direction.FORWARD)
-            .rightRearMotorDirection(DcMotorSimple.Direction.REVERSE);
+            .leftFrontMotorDirection(DcMotorSimple.Direction.FORWARD)
+            .leftRearMotorDirection(DcMotorSimple.Direction.REVERSE)
+            .rightFrontMotorDirection(DcMotorSimple.Direction.REVERSE)
+            .rightRearMotorDirection(DcMotorSimple.Direction.FORWARD);
 
     public static DriveEncoderConstants localizerConstants = new DriveEncoderConstants()
             .rightFrontMotorName("front-right-drive")
@@ -31,11 +31,14 @@ public class Constants {
             .leftRearMotorName("back-left-drive")
             .leftFrontMotorName("front-left-drive")
             .leftFrontEncoderDirection(Encoder.FORWARD)
-            .leftRearEncoderDirection(Encoder.FORWARD)
-            .rightFrontEncoderDirection(Encoder.FORWARD)
+            .leftRearEncoderDirection(Encoder.REVERSE)
+            .rightFrontEncoderDirection(Encoder.REVERSE)
             .rightRearEncoderDirection(Encoder.FORWARD)
             .robotLength(13.5)
-            .robotWidth(16.6);
+            .robotWidth(16.5)
+            .forwardTicksToInches(0.5)
+            .strafeTicksToInches(0.345)
+            .turnTicksToInches(-0.056);
 
 
     public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1, 1);
