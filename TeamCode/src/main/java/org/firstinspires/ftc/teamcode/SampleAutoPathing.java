@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
@@ -29,15 +30,73 @@ public class SampleAutoPathing extends LinearOpMode {
     private final Pose startPose = new Pose (20, 122, Math.toRadians(138));
     private final Pose shootPose = new Pose (46, 96, Math.toRadians(138));
 
+
     private PathChain driveFromStartToShoot;
 
-    public void buildPaths(){
-        //put in coordinates for starting pose to ending pose
-        driveFromStartToShoot = follower.pathBuilder()
-                .addPath(new BezierLine(startPose, shootPose))
-                .setLinearHeadingInterpolation(startPose.getHeading(), shootPose.getHeading())
-                .build();
-    }
+
+        public void buildPaths() {
+
+            Pose startPose = new Pose(
+                    46.5613,
+                    109.8891,
+                    Math.toRadians(90)
+            );
+
+            Pose path1End = new Pose(
+                    18.4874,
+                    83.1933,
+                    Math.toRadians(180)
+            );
+
+            Pose path2End = new Pose(
+                    56.1479,
+                    74.5412,
+                    Math.toRadians(59)
+            );
+
+            Pose path3End = new Pose(
+                    70.4824,
+                    14.3832,
+                    Math.toRadians(59) // tangential, will be overridden
+            );
+
+            driveFromStartToShoot = follower.pathBuilder()
+
+                    // ===== Path 1 =====
+                    .addPath(
+                            new BezierCurve(
+                                    startPose,
+                                    new Pose(66.8017, 103.4706),
+                                    path1End
+                            )
+                    )
+                    .setLinearHeadingInterpolation(
+                            Math.toRadians(144),
+                            Math.toRadians(180)
+                    )
+
+                    // ===== Path 2 =====
+                    .addPath(
+                            new BezierCurve(
+                                    path1End,
+                                    new Pose(27.3479, 65.1025),
+                                    path2End
+                            )
+                    )
+                    .setTangentHeadingInterpolation()
+
+                    // ===== Path 3 =====
+                    .addPath(
+                            new BezierLine(
+                                    path2End,
+                                    path3End
+                            )
+                    )
+                    .setTangentHeadingInterpolation()
+
+                    .build();
+        }
+
 
     public void statePathUpdate(){
         switch (pathState){
