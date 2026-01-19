@@ -11,8 +11,8 @@ import com.pedropathing.util.Timer;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
-@Autonomous(name = "BlueTopBezierAuto")
-public class BlueTopBezierAuto extends LinearOpMode {
+@Autonomous(name = "RedTopBezierAuto")
+public class RedTopBezierAuto extends LinearOpMode {
 
     private Follower follower;
 
@@ -33,11 +33,11 @@ public class BlueTopBezierAuto extends LinearOpMode {
 
     PathState pathState;
 
-    private final Pose startPose = new Pose (56, 8, Math.toRadians(180));
-    private final Pose shootPose = new Pose (56, 15, Math.toRadians(200));
-    private final Pose intake1Pose = new Pose (19, 35, Math.toRadians(180));
-    private final Pose intake2Pose = new Pose (19, 60, Math.toRadians(180));
-    private final Pose intake3Pose = new Pose (19, 85, Math.toRadians(180));
+    private final Pose startPose = new Pose (84, 8, Math.toRadians(0));
+    private final Pose shootPose = new Pose (84, 15, Math.toRadians(-20));
+    private final Pose intake1Pose = new Pose (126, 35, Math.toRadians(0));
+    private final Pose intake2Pose = new Pose (126, 60, Math.toRadians(0));
+    private final Pose intake3Pose = new Pose (126, 85, Math.toRadians(0));
 
     private PathChain driveFromStartToShoot, driveFromShootToIntake1, driveFromIntake1ToShoot, driveFromShootToIntake2, driveFromIntake2ToShoot, driveFromShootToIntake3, driveFromIntake3ToShoot;
 
@@ -49,32 +49,32 @@ public class BlueTopBezierAuto extends LinearOpMode {
                 .build();
 
         driveFromShootToIntake1 = follower.pathBuilder()
-                .addPath(new BezierCurve(shootPose, new Pose(55,44), intake1Pose))
+                .addPath(new BezierCurve(shootPose, new Pose(89,44), intake1Pose))
                 .setLinearHeadingInterpolation(shootPose.getHeading(), intake1Pose.getHeading())
                 .build();
 
         driveFromIntake1ToShoot = follower.pathBuilder()
-                .addPath(new BezierCurve(intake1Pose, new Pose(40, 34), shootPose))
+                .addPath(new BezierCurve(intake1Pose, new Pose(104, 34), shootPose))
                 .setLinearHeadingInterpolation(intake1Pose.getHeading(), shootPose.getHeading())
                 .build();
 
         driveFromShootToIntake2 = follower.pathBuilder()
-                .addPath(new BezierCurve(shootPose, new Pose(58,69), intake2Pose))
+                .addPath(new BezierCurve(shootPose, new Pose(88,69), intake2Pose))
                 .setLinearHeadingInterpolation(shootPose.getHeading(), intake2Pose.getHeading())
                 .build();
 
         driveFromIntake2ToShoot = follower.pathBuilder()
-                .addPath(new BezierCurve(intake2Pose, new Pose(43,46), shootPose))
+                .addPath(new BezierCurve(intake2Pose, new Pose(101,46), shootPose))
                 .setLinearHeadingInterpolation(intake2Pose.getHeading(), shootPose.getHeading())
                 .build();
 
         driveFromShootToIntake3 = follower.pathBuilder()
-                .addPath(new BezierCurve(shootPose, new Pose(61,95), intake3Pose))
+                .addPath(new BezierCurve(shootPose, new Pose(86,95), intake3Pose))
                 .setLinearHeadingInterpolation(shootPose.getHeading(), intake3Pose.getHeading())
                 .build();
 
         driveFromIntake3ToShoot = follower.pathBuilder()
-                .addPath(new BezierCurve(intake3Pose, new Pose(45,60), shootPose))
+                .addPath(new BezierCurve(intake3Pose, new Pose(100,60), shootPose))
                 .setLinearHeadingInterpolation(intake3Pose.getHeading(), shootPose.getHeading())
                 .build();
     }
