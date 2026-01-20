@@ -42,6 +42,18 @@ public class MainOpMode extends LinearOpMode {
             if(gamepad1.dpadDownWasPressed()){
                 fieldOriented = !fieldOriented;
             }
+            
+
+
+
+
+
+
+
+
+
+
+
 
             // Defaults to fieldOriented true
             if (fieldOriented) {

@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -15,6 +16,12 @@ public class AprilTag {
     private Telemetry telemetry;
     private AprilTagProcessor aprilTagProcessor;
     private VisionPortal visionPortal;
+    private double bearing = 0;
+    private double range = 0;
+    private boolean tagVisible = false;
+    private ElapsedTime detectionLostTimer = new ElapsedTime();
+    public TagData redTagData = new TagData(tagVisible, bearing, range);
+
 
     public AprilTag(HardwareMap hardwareMap, Telemetry telemetry, Drivetrain drivetrain) {
         this.telemetry = telemetry;
@@ -22,55 +29,43 @@ public class AprilTag {
         visionPortal = VisionPortal.easyCreateWithDefaults(hardwareMap.get(WebcamName.class, "Webcam 1"), aprilTagProcessor);
     }
 
-    public void giveBearing() {
+    public void readRedTag() {
         AprilTagDetection targetTagRed = null;
-        AprilTagDetection targetTagBlue = null;
         List<AprilTagDetection> detections = aprilTagProcessor.getDetections();
         for (AprilTagDetection tag : detections) {
             if (tag.id == 24) {
                 targetTagRed = tag;
-                break;  // Stop looping once we find it
-            } else if (tag.id == 20) {
-                targetTagBlue = tag;
                 break;
             }
         }
         if (targetTagRed != null) {
-            double bearing = targetTagRed.ftcPose.bearing;  // degrees
-            telemetry.addData("Target Tag", "Red Tag");
-            telemetry.addData("Bearing (deg)", "%.1f", bearing);
-        } else if (targetTagBlue != null) {
-            double bearing = targetTagBlue.ftcPose.bearing;  // degrees
-            telemetry.addData("Target Tag", "Blue Tag");
-            telemetry.addData("Bearing (deg)", "%.1f", bearing);
+            bearing = targetTagRed.ftcPose.bearing;  // degrees
+            range = targetTagRed.ftcPose.range;
+            tagVisible = true;
+            detectionLostTimer.reset();
         } else {
-            telemetry.addLine("Tag not Detected");
+            if (detectionLostTimer.milliseconds() <= 100) {
+                return;
+            } else {
+                bearing = 0;
+                range = 0;
+                tagVisible = false;
+            }
+        }
+
+        redTagData = new TagData(tagVisible, bearing, range);
+    }
+
+    public class TagData {
+        public boolean tagVisible;
+        public double tagBearingDeg;
+        public double tagRangeIn;
+
+        public TagData(boolean tagVisible, double tagBearingDeg, double tagRangeIn) {
+            this.tagVisible = tagVisible;
+            this.tagBearingDeg = tagBearingDeg;
+            this.tagRangeIn = tagRangeIn;
         }
     }
 
-    public void giveRange() {
-        AprilTagDetection targetTagRed = null;
-        AprilTagDetection targetTagBlue = null;
-        List<AprilTagDetection> detections = aprilTagProcessor.getDetections();
-        for (AprilTagDetection tag : detections) {
-            if (tag.id == 24) {
-                targetTagRed = tag;
-                break;  // Stop looping once we find it
-            } else if (tag.id == 20) {
-                targetTagBlue = tag;
-                break;
-            }
-        }
-        if (targetTagRed != null) {
-            double range = targetTagRed.ftcPose.range;  // degrees
-            telemetry.addData("Target Tag", "Red Tag");
-            telemetry.addData("Range", "%.1f", range);
-        } else if (targetTagBlue != null) {
-            double range = targetTagBlue.ftcPose.range;  // degrees
-            telemetry.addData("Target Tag", "Blue Tag");
-            telemetry.addData("Range", "%.1f", range);
-        } else {
-            telemetry.addLine("Tag not Detected");
-        }
-    }
 }

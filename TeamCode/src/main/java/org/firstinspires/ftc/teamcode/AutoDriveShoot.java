@@ -21,11 +21,10 @@ public class AutoDriveShoot {
     public double getTurnPower(
             double joystickTurn,
             boolean tagVisible,
-            double tagYawRad,
-            double robotHeadingRad,
-            double dt
+            double tagBearingDeg,
+            double robotHeadingDeg
     ) {
-        // 1️⃣ DRIVER OVERRIDE (absolute priority)
+        // DRIVER OVERRIDE (absolute priority)
         if (Math.abs(joystickTurn) > 0.05) {
             headingLocked = false;          // release lock
             lastTurnCmd = joystickTurn;     // immediate response
@@ -34,37 +33,37 @@ public class AutoDriveShoot {
 
         double turnCmd = 0.0;
 
-        // 2️⃣ AUTO-ALIGN WHEN TAG IS VISIBLE
+        // AUTO-ALIGN WHEN TAG IS VISIBLE
         if (tagVisible) {
 
             // If NOT aligned yet → vision PID controls turn
-            if (Math.abs(tagYawRad) > ALIGN_TOLERANCE_RAD) {
+            if (Math.abs(tagBearingDeg) > ALIGN_TOLERANCE_RAD) {
                 headingLocked = false;
-                turnCmd = aprilTagAlignPID.update(tagYawRad, dt);
+                turnCmd = aprilTagAlignPID.updateDrive(tagBearingDeg);
 
             } else {
-                // 3️⃣ TAG ALIGNED → LOCK IMU HEADING
+                // TAG ALIGNED → LOCK IMU HEADING
                 if (!headingLocked) {
-                    lockedHeadingRad = robotHeadingRad;
+                    lockedHeadingRad = robotHeadingDeg;
                     headingLocked = true;
                 }
 
-                double headingError = AngleUnit.normalizeRadians(lockedHeadingRad - robotHeadingRad);
-                turnCmd = headingHoldPID.update(headingError, dt);
+                double headingError = AngleUnit.normalizeRadians(lockedHeadingRad - robotHeadingDeg);
+                turnCmd = headingHoldPID.updateDrive(headingError);
             }
 
         } else {
-            // 4️⃣ NO TAG → HOLD LAST HEADING USING IMU
+            // NO TAG → HOLD LAST HEADING USING IMU
             if (!headingLocked) {
-                lockedHeadingRad = robotHeadingRad;
+                lockedHeadingRad = robotHeadingDeg;
                 headingLocked = true;
             }
 
-            double headingError = AngleUnit.normalizeRadians(lockedHeadingRad - robotHeadingRad);
-            turnCmd = headingHoldPID.update(headingError, dt);
+            double headingError = AngleUnit.normalizeRadians(lockedHeadingRad - robotHeadingDeg);
+            turnCmd = headingHoldPID.updateDrive(headingError);
         }
 
-        // 5️⃣ SMOOTH TRANSITION (prevents snapping)
+        // SMOOTH TRANSITION (prevents snapping)
         turnCmd = smooth(turnCmd, lastTurnCmd, 0.15);
 
         lastTurnCmd = turnCmd;
