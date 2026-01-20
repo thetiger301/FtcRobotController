@@ -32,6 +32,14 @@ public class Shooter {
     private double maxDecel = 1500;
     public double motorPower = 0;
 
+    private ElapsedTime launchTimer = new ElapsedTime();
+    private ElapsedTime loadingTimer = new ElapsedTime();
+    private boolean launching = false;
+    private boolean resetingShot = false;
+    private boolean loading = false;
+    public boolean launchingSequenceRunning = false;
+
+
     public Shooter(HardwareMap hardwareMap) {
         shooterAngle = hardwareMap.get(Servo.class, "shooter angle");
         shooterTrigger = hardwareMap.get(Servo.class, "shooter trigger");
@@ -39,7 +47,7 @@ public class Shooter {
         shooterFeeder2 = hardwareMap.get(CRServo.class, "shooter feeder 2");
 
         intake = hardwareMap.get(DcMotorEx.class, "intake");
-        intake.setDirection(DcMotorSimple.Direction.REVERSE);
+        intake.setDirection(DcMotorSimple.Direction.FORWARD);
 
         shooter1 = hardwareMap.get(DcMotorEx.class, "shooter 1");
         shooter2 = hardwareMap.get(DcMotorEx.class, "shooter 2");
@@ -134,7 +142,40 @@ public class Shooter {
         return velocity;
     }
 
-    public void shoot(double position) {
+
+
+    public void launchSequence() {
+        if (launchTimer.seconds() >= 0.8 & launching) {
+            setShooterPosition(1);
+            resetingShot = true;
+            launching = false;
+            loadingTimer.reset();
+        }
+
+        if (loadingTimer.seconds() >= 0.5 & resetingShot) {
+            setShooterFeeder(1);
+            loading = true;
+            resetingShot = false;
+            loadingTimer.reset();
+        }
+
+        if (loadingTimer.seconds() >= 0.5 & loading) {
+            setShooterFeeder(0);
+            loading = false;
+            launchingSequenceRunning = false;
+        }
+
+    }
+
+    public void initiateLaunchSequence() {
+        setShooterPosition(0.25);
+        launching = true;
+        launchTimer.reset();
+    }
+
+
+
+    public void setShooterPosition(double position) {
         shooterTrigger.setPosition(position);
     }
 

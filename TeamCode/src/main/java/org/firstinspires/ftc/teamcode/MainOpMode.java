@@ -47,10 +47,6 @@ public class MainOpMode extends LinearOpMode {
                 shooter.motorPowerDown(stepSizes[stepIndex]);
             }
 
-            if (gamepad1.rightBumperWasPressed()) {
-                curTargetVelocity = highVelocity;
-                shooter.resetPIDVelocity();
-            }
 
             if (gamepad1.leftBumperWasPressed()) {
                 curTargetVelocity = lowVelocity;
@@ -70,17 +66,23 @@ public class MainOpMode extends LinearOpMode {
 
             if (gamepad1.right_stick_button) {
                 shooter.setIntakePower(1);
+                shooter.setShooterFeeder(1);
             } else {
                 shooter.setIntakePower(0);
+                if (!shooter.launchingSequenceRunning) {
+                    shooter.setShooterFeeder(0);
+                }
             }
 
-            if (gamepad1.right_trigger > 0.05) {
-                shooter.shoot(0.35);
-            } else {
-                shooter.shoot(1);
+            if (gamepad1.rightBumperWasPressed()) {
+                shooter.launchingSequenceRunning = true;
+                shooter.initiateLaunchSequence();
             }
 
-            shooter.setShooterFeeder(1);
+            if (shooter.launchingSequenceRunning) {
+                shooter.launchSequence();
+            }
+
 
             telemetry.addData("Current Velocity", shooter.getShooterVelocity());
             telemetry.addData("Velocity Error", shooter.velocityError);
