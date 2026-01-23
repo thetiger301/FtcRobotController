@@ -22,11 +22,11 @@ public class Shooter {
     private double feedFoward = 0;
     ElapsedTime shooterPIDTimer = new ElapsedTime();
     public double dt = 0;
-    public double kP = 0.013;
+    public double kP = 0.017;
     public double kD = 0;
     public double kI = 0;
-    public double kV = 0.0005;
-    public double kS = 0.1;
+    public double kV = 0.0006;
+    public double kS = 0.18;
     private double commandedVelocity = 0;
     private double maxAccel = 3000;
     private double maxDecel = 1500;

@@ -10,8 +10,8 @@ public class MainOpMode extends LinearOpMode {
     public Shooter shooter;
     public double [] stepSizes = {1, 0.1, 0.01, 0.001, 0.0001};
     public int stepIndex = 1;
-    public int highVelocity = 1800;
-    public int lowVelocity = 1000;
+    public int highVelocity = 1000;
+    public int lowVelocity = 0;
     public int curTargetVelocity = 0;
 
     @Override
@@ -53,6 +53,11 @@ public class MainOpMode extends LinearOpMode {
                 shooter.resetPIDVelocity();
             }
 
+            if (gamepad1.rightBumperWasPressed()) {
+                curTargetVelocity = highVelocity;
+                shooter.resetPIDVelocity();
+            }
+
             shooter.motorPower = shooter.shooterPIDVelocity(curTargetVelocity, shooter.getShooterVelocity());
             shooter.setShooterPower(shooter.motorPower);
 
@@ -74,14 +79,8 @@ public class MainOpMode extends LinearOpMode {
                 }
             }
 
-            if (gamepad1.rightBumperWasPressed()) {
-                shooter.launchingSequenceRunning = true;
-                shooter.initiateLaunchSequence();
-            }
 
-            if (shooter.launchingSequenceRunning) {
-                shooter.launchSequence();
-            }
+
 
 
             telemetry.addData("Current Velocity", shooter.getShooterVelocity());
