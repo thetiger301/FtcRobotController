@@ -13,8 +13,6 @@ public class Drivetrain {
     private DcMotor frontLeft, frontRight, backLeft, backRight;
     private Telemetry telemetry;
     private IMU imu;
-    private double kP = 0.04;
-    private double errorTolerance = 2;
     public Drivetrain(HardwareMap hardwareMap, Telemetry telemetry) {
         this.telemetry = telemetry;
 
@@ -31,10 +29,10 @@ public class Drivetrain {
         backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         // Set directions (same as in your current OpMode)
-        frontLeft.setDirection(DcMotor.Direction.REVERSE);
-        backLeft.setDirection(DcMotor.Direction.FORWARD);
+        frontLeft.setDirection(DcMotor.Direction.FORWARD);
+        backLeft.setDirection(DcMotor.Direction.REVERSE);
         frontRight.setDirection(DcMotor.Direction.FORWARD);
-        backRight.setDirection(DcMotor.Direction.REVERSE);
+        backRight.setDirection(DcMotor.Direction.FORWARD);
         imu = hardwareMap.get(IMU.class, "imu");
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
                 RevHubOrientationOnRobot.LogoFacingDirection.UP,

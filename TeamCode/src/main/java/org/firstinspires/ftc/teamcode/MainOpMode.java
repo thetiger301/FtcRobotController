@@ -8,19 +8,22 @@ public class MainOpMode extends LinearOpMode {
 
     // System Declarations
     public Drivetrain drivetrain;
+    public ShootIntake shootIntake;
+    public AutoDriveShoot autoDriveShoot;
     public AprilTag aprilTag;
+    public PIDController shooterPidController;
     public boolean fieldOriented = true;
     public double axial, lateral, yaw;
-    public enum RobotState{
-        MANUAL,
-        INTAKE,
-        SCORE
-    }
-    public RobotState robotState = RobotState.MANUAL;
+    public double shooterPower = 0;
+    public double currentShooterVelocity = 0;
+    public double shooterVelocityError = 0;
+    public double velocityTarget = 0;
 
     @Override
     public void runOpMode() {
         drivetrain = new Drivetrain(hardwareMap, telemetry);
+        shootIntake = new ShootIntake(hardwareMap);
+        shooterPidController = new PIDController(0.017, 0, 0);
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -28,10 +31,17 @@ public class MainOpMode extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         drivetrain.resetIMU();
+        shootIntake.shooterTriggerReset();
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             // Competition Program
+            telemetry.addData("Status", "Running");
+
+            //----Sensor Updates----
+            currentShooterVelocity = shootIntake.getShooterVelocity();
+
+            //----Gamepad Updates----
 
             //Drivetrain control
             axial = -gamepad1.left_stick_y;
@@ -39,24 +49,49 @@ public class MainOpMode extends LinearOpMode {
             yaw = gamepad1.right_stick_x;
 
             // Field oriented drive toggle
-            if(gamepad1.dpadDownWasPressed()){
+            if (gamepad1.dpadDownWasPressed()){
                 fieldOriented = !fieldOriented;
             }
-            
 
+            // Shoot Button (Hold)
+            if (gamepad1.a) {
+                shootIntake.launchSequenceRunning = true;
+            } else {
+                shootIntake.launchSequenceRunning = false;
+            }
+            if (gamepad1.aWasPressed()) {
+                shootIntake.initiateLaunchSequence();
+            }
 
+            // Intake Button (Hold)
+            if (gamepad1.x) {
+                shootIntake.intaking = true;
+            }
+            if (gamepad1.xWasReleased()) {
+                shootIntake.intaking = false;
+                shootIntake.stopIntake();
+            }
 
+            //----Launch Sequence Logic----
+            if (shootIntake.launchSequenceRunning) {
+                velocityTarget = 1000;
+                shooterVelocityError = shootIntake.getShooterVelocityError(velocityTarget);
+                shootIntake.launchSequence(shooterVelocityError);
+            } else {
+                velocityTarget = 0;
+                shootIntake.endLaunchSequence();
+            }
 
+            if (shootIntake.launchSequenceRunning) {
+                shooterPower = shooterPidController.updateShooter(velocityTarget, currentShooterVelocity);
+            } else {
+                shooterPower = 0;
+            }
 
+            //----Motor and Servo Updates----
 
-
-
-
-
-
-
-            // Defaults to fieldOriented true
-            if (fieldOriented) {
+            // Run drivetrain
+            if (fieldOriented) { // Defaults to fieldOriented true
                 drivetrain.fieldOrientedDrive(axial, lateral, yaw);
                 telemetry.addData("Field Oriented Enabled", true);
             } else if (!fieldOriented) {
@@ -64,9 +99,23 @@ public class MainOpMode extends LinearOpMode {
                 telemetry.addData("Field Oriented Enabled", false);
             }
 
-            telemetry.addData("Status", "Running");
+            // Run Shooter
+            if (shootIntake.launchSequenceRunning) {
+                shooterPower = shooterPidController.updateShooter(velocityTarget, currentShooterVelocity);
+            } else {
+                shooterPower = 0;
+            }
+            shootIntake.setShooterPower(shooterPower);
+
+            // Run Intake
+            if (shootIntake.intaking) {
+                shootIntake.runIntake();
+            }
+
             telemetry.addData("Inputs", "axial: %.2f, lateral: %.2f, yaw: %.2f", axial, lateral, yaw);
             telemetry.addData("Heading", drivetrain.getHeading());
+            telemetry.addData("Shooter Current Velocity", currentShooterVelocity);
+            telemetry.addData(" Shooter Velocity Error", shooterVelocityError);
             telemetry.update();
         }
     }

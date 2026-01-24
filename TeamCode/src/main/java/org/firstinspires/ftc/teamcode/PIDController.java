@@ -20,9 +20,8 @@ public class PIDController {
     public double velocityError = 0;
     private double commandedVelocity = 0;
     private double feedFoward = 0;
-    public double kP = 0.013;
-    public double kV = 0.0005;
-    public double kS = 0.1;
+    public double kV = 0.0006;
+    public double kS = 0.18;
     private double maxAccel = 3000;
     private double maxDecel = 1500;
 
@@ -94,9 +93,12 @@ public class PIDController {
 
         // Feedfoward
         feedFoward = kV * commandedVelocity;
+        feedFoward += kS * Math.signum(commandedVelocity);
+        /*
         if (Math.abs(commandedVelocity) > 50) {
             feedFoward += kS * Math.signum(commandedVelocity);
         }
+        */
 
         double output = (kP * velocityError) + (kD * derivative) + (kI * integralSum) + (feedFoward);
 

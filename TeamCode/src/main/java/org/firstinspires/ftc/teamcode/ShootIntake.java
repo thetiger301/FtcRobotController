@@ -18,10 +18,14 @@ public class ShootIntake {
     // Launch Sequence Variables
     private ElapsedTime launchTimer = new ElapsedTime();
     private ElapsedTime loadingTimer = new ElapsedTime();
+    private boolean waitingForLaunch = false;
     private boolean launching = false;
     private boolean resetingShot = false;
     private boolean loading = false;
-    public boolean launchingSequenceRunning = false;
+    private double shooterVelocityErrorTolerance = 20;
+    public boolean launchSequenceRunning = false;
+    // Intake Variables
+    public boolean intaking = false;
 
     public ShootIntake(HardwareMap hardwareMap) {
         shooterAngle = hardwareMap.get(Servo.class, "shooter angle");
@@ -46,18 +50,24 @@ public class ShootIntake {
         shooter2.setPower(power);
     }
 
-    public void setIntakePower(double power) {
-        intake.setPower(power);
+    public void runIntake() {
+        intake.setPower(1);
+        setShooterFeederPower(1);
+    }
+
+    public void stopIntake() {
+        intake.setPower(0);
+        setShooterFeederPower(0);
     }
     public void shooterTrigger() {
-        shooterTrigger.setPosition(0.25);
+        shooterTrigger.setPosition(0.65);
     }
 
     public void shooterTriggerReset() {
         shooterTrigger.setPosition(1);
     }
 
-    public void setShooterFeeder(double power) {
+    public void setShooterFeederPower(double power) {
         shooterFeeder1.setPower(power);
         shooterFeeder2.setPower(-power);
     }
@@ -66,34 +76,60 @@ public class ShootIntake {
         shooterAngle.setPosition(position);
     }
 
-
     // Launch Sequence Functions
-    public void launchSequence() {
-        if (launchTimer.seconds() >= 0.8 & launching) {
+    public void launchSequence(double shooterVelocityError) {
+        if (waitingForLaunch && Math.abs(shooterVelocityError) <= shooterVelocityErrorTolerance) {
+            shooterTrigger();
+            launchTimer.reset();
+            waitingForLaunch = false;
+            launching = true;
+        }
+        if (launchTimer.seconds() >= 0.3 && launching) {
             shooterTriggerReset();
             resetingShot = true;
             launching = false;
             loadingTimer.reset();
         }
 
-        if (loadingTimer.seconds() >= 0.5 & resetingShot) {
-            setShooterFeeder(1);
+        if (loadingTimer.seconds() >= 0.3 && resetingShot) {
+            runIntake();
             loading = true;
             resetingShot = false;
             loadingTimer.reset();
         }
 
-        if (loadingTimer.seconds() >= 0.5 & loading) {
-            setShooterFeeder(0);
+        if (loadingTimer.seconds() >= 0.4 && loading) {
+            stopIntake();
+            waitingForLaunch = true;
             loading = false;
-            launchingSequenceRunning = false;
         }
-
     }
 
     public void initiateLaunchSequence() {
-        shooterTrigger();
-        launching = true;
-        launchTimer.reset();
+        waitingForLaunch = true;
+    }
+
+    public void endLaunchSequence() {
+        if (launching) {
+            shooterTriggerReset();
+            launching = false;
+        }
+        if (resetingShot) {
+            resetingShot = false;
+        }
+        if (loadingTimer.seconds() >= 0.4 && loading) {
+            stopIntake();
+            loading = false;
+        }
+    }
+
+    // Return Shooter Current Velocity
+    public double getShooterVelocity() {
+        return shooter1.getVelocity();
+    }
+
+    // Return Shooter Velocity Error
+    public double getShooterVelocityError(double target) {
+        return target - shooter1.getVelocity();
     }
 }
