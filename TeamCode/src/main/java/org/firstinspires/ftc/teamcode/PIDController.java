@@ -26,7 +26,8 @@ public class PIDController {
     private double maxDecel = 1500;
 
     // Timer Variables
-    private ElapsedTime PIDTimer = new ElapsedTime();
+    private ElapsedTime drivePIDTimer = new ElapsedTime();
+    private ElapsedTime shooterPIDTimer = new ElapsedTime();
     private double dt = 0;
 
     public PIDController(double kP, double kI, double kD) {
@@ -35,45 +36,40 @@ public class PIDController {
         this.kD = kD;
     }
 
-    public void setIntegralLimit(double limit) {
-        integralLimit = limit;
-        useIntegral = true;
-    }
-
     public void reset() {
         integralSum = 0.0;
+        derivative = 0.0;
         lastError = 0.0;
+        lastVelocity = 0.0;
+        commandedVelocity = 0.0;
     }
 
     public double updateDrive(double error) {
         // loop timer
-        dt = PIDTimer.seconds();
-        if (dt <= 0) {
-            dt = 1e-3;
-        }
-
-        // Integral
-        if (useIntegral) {
-            integralSum += error * dt;
-            integralSum = Range.clip(integralSum, -integralLimit, integralLimit);
-        }
+        dt = drivePIDTimer.seconds();
+        dt = Range.clip(dt, 0.001, 0.05); // 1ms–50ms
 
         // Derivative
-        derivative = (error - lastError) / dt;
+        double rawDerivative = (error - lastError) / dt;
+        derivative = derivative * 0.8 + rawDerivative * 0.2;
         lastError = error;
+        drivePIDTimer.reset();
 
-        PIDTimer.reset();
+        double output = (kP * error) + (kD * derivative);
+        if (Math.abs(output) < 1.0) {
+            integralSum += error * dt;
+            integralSum = Range.clip(integralSum, -2000, 2000);
+        }
 
-        return (kP * error) + (kI * integralSum) + (kD * derivative);
+        double finalOutput = output + (kI * integralSum);
+        return finalOutput;
     }
 
 
     public double updateShooter(double targetVelocity, double currentVelocity) {
         // Loop time
-        dt = PIDTimer.seconds();
-        if (dt <= 0) {
-            dt = 1e-3;
-        }
+        dt = shooterPIDTimer.seconds();
+        dt = Range.clip(dt, 0.001, 0.05); // 1ms–50ms
 
         // Acceleration rate clamp
         double delta = targetVelocity - commandedVelocity;
@@ -86,10 +82,8 @@ public class PIDController {
 
         // Derivative
         derivative = (currentVelocity - lastVelocity) / dt;
-
-        //Integral
-        integralSum = integralSum + (velocityError * dt);
-        integralSum = Range.clip(integralSum, -5000, 5000);
+        lastVelocity = currentVelocity;
+        shooterPIDTimer.reset();
 
         // Feedfoward
         feedFoward = kV * commandedVelocity;
@@ -100,12 +94,16 @@ public class PIDController {
         }
         */
 
-        double output = (kP * velocityError) + (kD * derivative) + (kI * integralSum) + (feedFoward);
+        double output = (kP * velocityError) + (kD * derivative) + (feedFoward);
 
-        lastVelocity = currentVelocity;
-        PIDTimer.reset();
+        //Integral
+        if (Math.abs(output) < 1.0) {
+            integralSum += velocityError * dt;
+            integralSum = Range.clip(integralSum, -2000, 2000);
+        }
 
-        double finalOutput = Range.clip(output, -1, 1);
+        double finalOutput = output + (kI * integralSum);
+        finalOutput = Range.clip(finalOutput, -1, 1);
         return finalOutput;
     }
 

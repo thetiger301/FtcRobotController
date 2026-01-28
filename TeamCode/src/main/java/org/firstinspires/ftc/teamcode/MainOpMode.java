@@ -23,7 +23,8 @@ public class MainOpMode extends LinearOpMode {
     public void runOpMode() {
         drivetrain = new Drivetrain(hardwareMap, telemetry);
         shootIntake = new ShootIntake(hardwareMap);
-        shooterPidController = new PIDController(0.017, 0, 0);
+        aprilTag = new AprilTag(hardwareMap);
+        autoDriveShoot = new AutoDriveShoot();
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -40,6 +41,7 @@ public class MainOpMode extends LinearOpMode {
 
             //----Sensor Updates----
             currentShooterVelocity = shootIntake.getShooterVelocity();
+            aprilTag.readRedTag();
 
             //----Gamepad Updates----
 
@@ -72,6 +74,13 @@ public class MainOpMode extends LinearOpMode {
                 shootIntake.stopIntake();
             }
 
+            // Auto Align Button (Hold)
+            if (gamepad1.right_bumper) {
+                autoDriveShoot.autoAlignEnabled = true;
+            } else {
+                autoDriveShoot.autoAlignEnabled = false;
+            }
+
             //----Launch Sequence Logic----
             if (shootIntake.launchSequenceRunning) {
                 velocityTarget = 1000;
@@ -80,12 +89,6 @@ public class MainOpMode extends LinearOpMode {
             } else {
                 velocityTarget = 0;
                 shootIntake.endLaunchSequence();
-            }
-
-            if (shootIntake.launchSequenceRunning) {
-                shooterPower = shooterPidController.updateShooter(velocityTarget, currentShooterVelocity);
-            } else {
-                shooterPower = 0;
             }
 
             //----Motor and Servo Updates----
@@ -101,9 +104,10 @@ public class MainOpMode extends LinearOpMode {
 
             // Run Shooter
             if (shootIntake.launchSequenceRunning) {
-                shooterPower = shooterPidController.updateShooter(velocityTarget, currentShooterVelocity);
+                shooterPower = shootIntake.getShooterPower(velocityTarget, currentShooterVelocity);
             } else {
                 shooterPower = 0;
+                shooterPidController.reset();
             }
             shootIntake.setShooterPower(shooterPower);
 
@@ -112,10 +116,14 @@ public class MainOpMode extends LinearOpMode {
                 shootIntake.runIntake();
             }
 
+            //----Telemetry Updates----
             telemetry.addData("Inputs", "axial: %.2f, lateral: %.2f, yaw: %.2f", axial, lateral, yaw);
             telemetry.addData("Heading", drivetrain.getHeading());
             telemetry.addData("Shooter Current Velocity", currentShooterVelocity);
             telemetry.addData(" Shooter Velocity Error", shooterVelocityError);
+            telemetry.addData("Detection Rate", aprilTag.getDetectionRate());
+            telemetry.addData("Detection Confidence", aprilTag.getConfidence());
+            telemetry.addData("Detection Valid", aprilTag.isValid());
             telemetry.update();
         }
     }

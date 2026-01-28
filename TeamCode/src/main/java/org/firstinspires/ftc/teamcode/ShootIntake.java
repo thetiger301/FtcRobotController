@@ -14,6 +14,7 @@ public class ShootIntake {
     private CRServo shooterFeeder1;
     private CRServo shooterFeeder2;
     private DcMotorEx intake;
+    private PIDController shooterPidController;
 
     // Launch Sequence Variables
     private ElapsedTime launchTimer = new ElapsedTime();
@@ -41,6 +42,8 @@ public class ShootIntake {
 
         shooter1.setDirection(DcMotorSimple.Direction.FORWARD);
         shooter2.setDirection(DcMotorSimple.Direction.FORWARD);
+
+        shooterPidController = new PIDController(0.017, 0, 0);
     }
 
 
@@ -121,6 +124,11 @@ public class ShootIntake {
             stopIntake();
             loading = false;
         }
+    }
+
+
+    public double getShooterPower(double target, double current) {
+        shooterPidController.updateShooter(target, current);
     }
 
     // Return Shooter Current Velocity
