@@ -12,14 +12,15 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class Constants {
     public static FollowerConstants followerConstants = new FollowerConstants()
-            .mass(5);
+            .mass(10);
+
 
     public static MecanumConstants driveConstants = new MecanumConstants()
             .maxPower(1)
-            .rightFrontMotorName("front-left-drive")
+            .rightFrontMotorName("front-right-drive")
             .rightRearMotorName("back-right-drive")
             .leftRearMotorName("back-left-drive")
-            .leftFrontMotorName("front-right-drive")
+            .leftFrontMotorName("front-left-drive")
             .leftFrontMotorDirection(DcMotorSimple.Direction.FORWARD)
             .leftRearMotorDirection(DcMotorSimple.Direction.REVERSE)
             .rightFrontMotorDirection(DcMotorSimple.Direction.FORWARD)
