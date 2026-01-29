@@ -126,9 +126,12 @@ public class ShootIntake {
         }
     }
 
-
     public double getShooterPower(double target, double current) {
-        shooterPidController.updateShooter(target, current);
+        return shooterPidController.updateShooter(target, current);
+    }
+
+    public void resetShooterPIDController() {
+        shooterPidController.reset();
     }
 
     // Return Shooter Current Velocity

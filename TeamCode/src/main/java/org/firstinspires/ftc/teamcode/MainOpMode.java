@@ -11,13 +11,19 @@ public class MainOpMode extends LinearOpMode {
     public ShootIntake shootIntake;
     public AutoDriveShoot autoDriveShoot;
     public AprilTag aprilTag;
-    public PIDController shooterPidController;
     public boolean fieldOriented = true;
     public double axial, lateral, yaw;
     public double shooterPower = 0;
     public double currentShooterVelocity = 0;
     public double shooterVelocityError = 0;
     public double velocityTarget = 0;
+    public double currentHeadingDeg = 0;
+    public double angularVelocity = 0;
+    public double aprilTagBearing = 0;
+    public double [] stepSizes = {1, 0.1, 0.01, 0.001, 0.0001};
+    public int stepIndex = 1;
+
+    public double turnPower = 0;
 
     @Override
     public void runOpMode() {
@@ -42,19 +48,24 @@ public class MainOpMode extends LinearOpMode {
             //----Sensor Updates----
             currentShooterVelocity = shootIntake.getShooterVelocity();
             aprilTag.readRedTag();
+            aprilTagBearing = aprilTag.getEffectiveBearing();
+            currentHeadingDeg = drivetrain.getHeading();
+            angularVelocity = drivetrain.getAngularVelocity();
 
             //----Gamepad Updates----
 
             //Drivetrain control
             axial = -gamepad1.left_stick_y;
             lateral = gamepad1.left_stick_x;
-            yaw = gamepad1.right_stick_x;
+            //yaw = gamepad1.right_stick_x;
+            yaw = turnPower;
 
             // Field oriented drive toggle
+            /*
             if (gamepad1.dpadDownWasPressed()){
                 fieldOriented = !fieldOriented;
             }
-
+            */
             // Shoot Button (Hold)
             if (gamepad1.a) {
                 shootIntake.launchSequenceRunning = true;
@@ -81,6 +92,26 @@ public class MainOpMode extends LinearOpMode {
                 autoDriveShoot.autoAlignEnabled = false;
             }
 
+            if (gamepad1.yWasPressed()) {
+                stepIndex = (stepIndex + 1) % stepSizes.length;
+            }
+
+            if (gamepad1.dpadRightWasPressed()) {
+                turnPower += stepSizes[stepIndex];
+            }
+
+            if (gamepad1.dpadLeftWasPressed()) {
+                turnPower -= stepSizes[stepIndex];
+            }
+
+            if (gamepad1.dpadUpWasPressed()) {
+                autoDriveShoot.kDUp(stepSizes[stepIndex]);
+            }
+
+            if (gamepad1.dpadDownWasPressed()) {
+                autoDriveShoot.kDDown(stepSizes[stepIndex]);
+            }
+
             //----Launch Sequence Logic----
             if (shootIntake.launchSequenceRunning) {
                 velocityTarget = 1000;
@@ -95,9 +126,15 @@ public class MainOpMode extends LinearOpMode {
 
             // Run drivetrain
             if (fieldOriented) { // Defaults to fieldOriented true
+                if (autoDriveShoot.autoAlignEnabled) {
+                    yaw = autoDriveShoot.getAlignmentTurnPower(currentHeadingDeg, angularVelocity);
+                }
                 drivetrain.fieldOrientedDrive(axial, lateral, yaw);
                 telemetry.addData("Field Oriented Enabled", true);
             } else if (!fieldOriented) {
+                if (autoDriveShoot.autoAlignEnabled) {
+                    yaw = autoDriveShoot.getAlignmentTurnPower(currentHeadingDeg, angularVelocity);
+                }
                 drivetrain.drive(axial, lateral, yaw);
                 telemetry.addData("Field Oriented Enabled", false);
             }
@@ -107,7 +144,7 @@ public class MainOpMode extends LinearOpMode {
                 shooterPower = shootIntake.getShooterPower(velocityTarget, currentShooterVelocity);
             } else {
                 shooterPower = 0;
-                shooterPidController.reset();
+                shootIntake.resetShooterPIDController();
             }
             shootIntake.setShooterPower(shooterPower);
 
@@ -120,10 +157,19 @@ public class MainOpMode extends LinearOpMode {
             telemetry.addData("Inputs", "axial: %.2f, lateral: %.2f, yaw: %.2f", axial, lateral, yaw);
             telemetry.addData("Heading", drivetrain.getHeading());
             telemetry.addData("Shooter Current Velocity", currentShooterVelocity);
-            telemetry.addData(" Shooter Velocity Error", shooterVelocityError);
+            telemetry.addData("Shooter Velocity Error", shooterVelocityError);
             telemetry.addData("Detection Rate", aprilTag.getDetectionRate());
             telemetry.addData("Detection Confidence", aprilTag.getConfidence());
             telemetry.addData("Detection Valid", aprilTag.isValid());
+            telemetry.addData("Effective Bearing", aprilTag.getEffectiveBearing());
+            telemetry.addData("Step Size", stepSizes[stepIndex]);
+            telemetry.addData("kP", autoDriveShoot.kP);
+            telemetry.addData("kI", autoDriveShoot.kI);
+            telemetry.addData("kD", autoDriveShoot.kD);
+            telemetry.addData("Heading Error", (autoDriveShoot.angleError(90, currentHeadingDeg)));
+            telemetry.addData("Current Heading", drivetrain.getHeading());
+            telemetry.addData("Turn Power", turnPower);
+            telemetry.addData("Voltage", hardwareMap.voltageSensor.iterator().next().getVoltage());
             telemetry.update();
         }
     }

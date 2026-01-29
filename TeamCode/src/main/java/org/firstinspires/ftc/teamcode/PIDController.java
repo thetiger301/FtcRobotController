@@ -53,13 +53,14 @@ public class PIDController {
         double rawDerivative = (error - lastError) / dt;
         derivative = derivative * 0.8 + rawDerivative * 0.2;
         lastError = error;
-        drivePIDTimer.reset();
 
         double output = (kP * error) + (kD * derivative);
         if (Math.abs(output) < 1.0) {
             integralSum += error * dt;
             integralSum = Range.clip(integralSum, -2000, 2000);
         }
+
+        drivePIDTimer.reset();
 
         double finalOutput = output + (kI * integralSum);
         return finalOutput;
