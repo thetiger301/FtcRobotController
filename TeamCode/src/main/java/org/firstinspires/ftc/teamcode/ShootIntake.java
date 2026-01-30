@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
 
 public class ShootIntake {
     private DcMotorEx shooter1, shooter2;
@@ -14,7 +15,6 @@ public class ShootIntake {
     private CRServo shooterFeeder1;
     private CRServo shooterFeeder2;
     private DcMotorEx intake;
-    private PIDController shooterPidController;
 
     // Launch Sequence Variables
     private ElapsedTime launchTimer = new ElapsedTime();
@@ -25,8 +25,27 @@ public class ShootIntake {
     private boolean loading = false;
     private double shooterVelocityErrorTolerance = 20;
     public boolean launchSequenceRunning = false;
+
+    // Launch Zone Variables
+    private double[] launchZonePositions = {0, 0.5, 1};
+    private int launchZoneIndex = 0;
+    private String launchZone = "Close Zone";
+
     // Intake Variables
     public boolean intaking = false;
+
+    // Shooter PID Variables
+    private double lastVelocity = 0;
+    public double velocityError = 0;
+    private double commandedVelocity = 0;
+    private double feedFoward = 0;
+    private double kP = 0.017;
+    private double kV = 0.0006;
+    private double kS = 0.18;
+    private double maxAccel = 3000;
+    private double maxDecel = 1500;
+    private ElapsedTime shooterPIDTimer = new ElapsedTime();
+    private double dt = 0;
 
     public ShootIntake(HardwareMap hardwareMap) {
         shooterAngle = hardwareMap.get(Servo.class, "shooter angle");
@@ -42,8 +61,6 @@ public class ShootIntake {
 
         shooter1.setDirection(DcMotorSimple.Direction.FORWARD);
         shooter2.setDirection(DcMotorSimple.Direction.FORWARD);
-
-        shooterPidController = new PIDController(0.017, 0, 0);
     }
 
 
@@ -109,6 +126,7 @@ public class ShootIntake {
     }
 
     public void initiateLaunchSequence() {
+        setShooterAnglePosition(launchZonePositions[launchZoneIndex]);
         waitingForLaunch = true;
     }
 
@@ -126,9 +144,67 @@ public class ShootIntake {
         }
     }
 
+    // Shooter PID
+    public double getShooterPower(double targetVelocity, double currentVelocity) {
+        // Loop time
+        dt = shooterPIDTimer.seconds();
+        dt = Range.clip(dt, 0.001, 0.05); // 1ms–50ms
 
-    public double getShooterPower(double target, double current) {
-        shooterPidController.updateShooter(target, current);
+        // Acceleration rate clamp
+        double delta = targetVelocity - commandedVelocity;
+        double maxDelta = (delta > 0 ? maxAccel : maxDecel) * dt;
+        delta = Range.clip(delta, -maxDelta, maxDelta);
+        commandedVelocity += delta;
+
+        shooterPIDTimer.reset();
+
+        // Error Calculation
+        velocityError = commandedVelocity - currentVelocity;
+
+        // Feedfoward
+        feedFoward = kV * commandedVelocity;
+        feedFoward += kS * Math.signum(commandedVelocity);
+        /*
+        if (Math.abs(commandedVelocity) > 50) {
+            feedFoward += kS * Math.signum(commandedVelocity);
+        }
+        */
+
+        double output = (kP * velocityError) + (feedFoward);
+
+        output = Range.clip(output, -1, 1);
+        return output;
+    }
+
+    public void resetShooterPID() {
+        lastVelocity = 0.0;
+        commandedVelocity = 0.0;
+    }
+
+    // Launch Zone Setters
+    public void setCloseLaunchZone() {
+        launchZoneIndex = 0;
+    }
+
+    public void setMidLaunchZone() {
+        launchZoneIndex = 1;
+    }
+
+    public void setFarLaunchZone() {
+        launchZoneIndex = 2;
+    }
+
+    public String getCurrentLaunchZone() {
+        if (launchZoneIndex == 0) {
+            launchZone = "Close Zone";
+        }
+        if (launchZoneIndex == 1) {
+            launchZone = "Mid Zone";
+        }
+        if (launchZoneIndex == 2) {
+            launchZone = "Far Zone";
+        }
+        return  launchZone;
     }
 
     // Return Shooter Current Velocity

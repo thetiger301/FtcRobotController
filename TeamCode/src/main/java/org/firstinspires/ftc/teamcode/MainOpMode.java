@@ -11,7 +11,6 @@ public class MainOpMode extends LinearOpMode {
     public ShootIntake shootIntake;
     public AutoDriveShoot autoDriveShoot;
     public AprilTag aprilTag;
-    public PIDController shooterPidController;
     public boolean fieldOriented = true;
     public double axial, lateral, yaw;
     public double shooterPower = 0;
@@ -65,6 +64,17 @@ public class MainOpMode extends LinearOpMode {
                 shootIntake.initiateLaunchSequence();
             }
 
+            // Launch Zone Set Buttons (Press)
+            if (gamepad2.xWasPressed()) {
+                shootIntake.setCloseLaunchZone();
+            }
+            if (gamepad2.yWasPressed()) {
+                shootIntake.setMidLaunchZone();
+            }
+            if (gamepad2.bWasPressed()) {
+                shootIntake.setFarLaunchZone();
+            }
+
             // Intake Button (Hold)
             if (gamepad1.x) {
                 shootIntake.intaking = true;
@@ -107,7 +117,7 @@ public class MainOpMode extends LinearOpMode {
                 shooterPower = shootIntake.getShooterPower(velocityTarget, currentShooterVelocity);
             } else {
                 shooterPower = 0;
-                shooterPidController.reset();
+                shootIntake.resetShooterPID();
             }
             shootIntake.setShooterPower(shooterPower);
 
@@ -121,6 +131,7 @@ public class MainOpMode extends LinearOpMode {
             telemetry.addData("Heading", drivetrain.getHeading());
             telemetry.addData("Shooter Current Velocity", currentShooterVelocity);
             telemetry.addData(" Shooter Velocity Error", shooterVelocityError);
+            telemetry.addLine(shootIntake.getCurrentLaunchZone());
             telemetry.addData("Detection Rate", aprilTag.getDetectionRate());
             telemetry.addData("Detection Confidence", aprilTag.getConfidence());
             telemetry.addData("Detection Valid", aprilTag.isValid());
