@@ -47,6 +47,12 @@ public class ShootIntake {
     private ElapsedTime shooterPIDTimer = new ElapsedTime();
     private double dt = 0;
 
+
+
+    public double currentShooterAngle = 0;
+
+
+
     public ShootIntake(HardwareMap hardwareMap) {
         shooterAngle = hardwareMap.get(Servo.class, "shooter angle");
         shooterTrigger = hardwareMap.get(Servo.class, "shooter trigger");
@@ -126,7 +132,7 @@ public class ShootIntake {
     }
 
     public void initiateLaunchSequence() {
-        setShooterAnglePosition(launchZonePositions[launchZoneIndex]);
+        //setShooterAnglePosition(launchZonePositions[launchZoneIndex]);
         waitingForLaunch = true;
     }
 
@@ -216,4 +222,16 @@ public class ShootIntake {
     public double getShooterVelocityError(double target) {
         return target - shooter1.getVelocity();
     }
+
+    public void shooterAnglePositionUp(double change) {
+        currentShooterAngle += change;
+        currentShooterAngle = Range.clip(currentShooterAngle, 0, 1);
+        setShooterAnglePosition(currentShooterAngle);
+    }
+    public void shooterAnglePositionDown(double change) {
+        currentShooterAngle -= change;
+        currentShooterAngle = Range.clip(currentShooterAngle, 0, 1);
+        setShooterAnglePosition(currentShooterAngle);
+    }
+
 }

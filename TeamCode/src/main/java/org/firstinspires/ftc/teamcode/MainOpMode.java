@@ -18,6 +18,10 @@ public class MainOpMode extends LinearOpMode {
     public double shooterVelocityError = 0;
     public double velocityTarget = 0;
 
+    public double [] stepSizes = {1, 0.1, 0.01, 0.001, 0.0001};
+    public int stepIndex = 1;
+
+
     @Override
     public void runOpMode() {
         drivetrain = new Drivetrain(hardwareMap, telemetry);
@@ -44,15 +48,20 @@ public class MainOpMode extends LinearOpMode {
 
             //----Gamepad Updates----
 
+            if (gamepad1.yWasPressed()) {
+                stepIndex = (stepIndex + 1) % stepSizes.length;
+            }
+            if (gamepad1.dpadUpWasPressed()) {
+                shootIntake.shooterAnglePositionUp(stepSizes[stepIndex]);
+            }
+            if (gamepad1.dpadDownWasPressed()) {
+                shootIntake.shooterAnglePositionDown(stepSizes[stepIndex]);
+            }
+
             //Drivetrain control
             axial = -gamepad1.left_stick_y;
             lateral = gamepad1.left_stick_x;
             yaw = gamepad1.right_stick_x;
-
-            // Field oriented drive toggle
-            if (gamepad1.dpadDownWasPressed()){
-                fieldOriented = !fieldOriented;
-            }
 
             // Shoot Button (Hold)
             if (gamepad1.a) {
@@ -93,7 +102,7 @@ public class MainOpMode extends LinearOpMode {
 
             //----Launch Sequence Logic----
             if (shootIntake.launchSequenceRunning) {
-                velocityTarget = 1000;
+                velocityTarget = 1500;
                 shooterVelocityError = shootIntake.getShooterVelocityError(velocityTarget);
                 shootIntake.launchSequence(shooterVelocityError);
             } else {
@@ -135,6 +144,9 @@ public class MainOpMode extends LinearOpMode {
             telemetry.addData("Detection Rate", aprilTag.getDetectionRate());
             telemetry.addData("Detection Confidence", aprilTag.getConfidence());
             telemetry.addData("Detection Valid", aprilTag.isValid());
+
+            telemetry.addData("Step Size", stepSizes[stepIndex]);
+            telemetry.addData("Shooter Angle", shootIntake.currentShooterAngle);
             telemetry.update();
         }
     }
