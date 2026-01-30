@@ -21,10 +21,10 @@ public class BlueTopAuto extends LinearOpMode {
         if (opModeIsActive()) {
             drivetrain.strafeDistance(6, .5);
             sleep(500);
-            drivetrain.turnToAngle(20, .5);
+            //drivetrain.turnToAngle(20, .5);
             sleep(500);
             //TODO add shooter code
-            drivetrain.turnToAngle(0,.5);
+            //drivetrain.turnToAngle(0,.5);
             sleep(500);
             drivetrain.strafeDistance(21,.8);
             sleep(500);
@@ -34,10 +34,10 @@ public class BlueTopAuto extends LinearOpMode {
             sleep(500);
             drivetrain.strafeDistance(-21,.8);
             sleep(500);
-            drivetrain.turnToAngle(20,.5);
+            //drivetrain.turnToAngle(20,.5);
             sleep(500);
             //TODO add shooter code
-            drivetrain.turnToAngle(0,.5);
+            //drivetrain.turnToAngle(0,.5);
             sleep(500);
             drivetrain.strafeDistance(45,.8);
             sleep(500);
@@ -47,10 +47,10 @@ public class BlueTopAuto extends LinearOpMode {
             sleep(500);
             drivetrain.strafeDistance(-45,.8);
             sleep(500);
-            drivetrain.turnToAngle(20,.5);
+            //drivetrain.turnToAngle(20,.5);
             sleep(500);
             //TODO add shooter code
-            drivetrain.turnToAngle(0,.5);
+            //drivetrain.turnToAngle(0,.5);
             sleep(500);
             drivetrain.strafeDistance(69,.8);
             sleep(500);
@@ -60,7 +60,7 @@ public class BlueTopAuto extends LinearOpMode {
             sleep(500);
             drivetrain.strafeDistance(-69,.8);
             sleep(500);
-            drivetrain.turnToAngle(20,.5);
+            //drivetrain.turnToAngle(20,.5);
             sleep(500);
             //TODO add shooter code
         }
