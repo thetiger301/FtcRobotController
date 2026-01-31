@@ -294,16 +294,6 @@ public class Drivetrain {
         return backRight.getCurrentPosition();
     }
 
-    public void setFrontLeftPower(double power){
-        frontLeft.setPower(power);
-    }
-    public void setFrontRightPower(double power){
-        frontRight.setPower(power);
-    }
-    public void setBackLeftPower(double power){
-        backLeft.setPower(power);
-    }
-    public void setBackRightPower(double power){
-        backRight.setPower(power);
-    }
+    
+
 }
