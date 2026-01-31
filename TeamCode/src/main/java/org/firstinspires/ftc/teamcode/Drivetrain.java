@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 
@@ -162,15 +161,6 @@ public class Drivetrain {
 
         // Stop all motion
         frontLeft.setPower(0);
-        frontRight.setPower(0);
-        backLeft.setPower(0);
-        backRight.setPower(0);
-
-        // Return to encoder mode
-        frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     public void turnToAngle(double targetAngle, double power) {
@@ -286,5 +276,34 @@ public class Drivetrain {
 
     public void stop() {
         drive(0, 0, 0);
+    }
+
+    public double getFrontLeftPosition() {
+        return frontLeft.getCurrentPosition();
+    }
+
+    public double getFrontRightPosition() {
+        return frontRight.getCurrentPosition();
+    }
+
+    public double getBackLeftPosition() {
+        return backLeft.getCurrentPosition();
+    }
+
+    public double getBackRightPosition() {
+        return backRight.getCurrentPosition();
+    }
+
+    public void setFrontLeftPower(double power){
+        frontLeft.setPower(power);
+    }
+    public void setFrontRightPower(double power){
+        frontRight.setPower(power);
+    }
+    public void setBackLeftPower(double power){
+        backLeft.setPower(power);
+    }
+    public void setBackRightPower(double power){
+        backRight.setPower(power);
     }
 }

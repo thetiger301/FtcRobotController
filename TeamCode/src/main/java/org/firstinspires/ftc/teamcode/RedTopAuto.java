@@ -3,8 +3,6 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.teamcode.Drivetrain;
-
 @Autonomous(name = "Red Top Auto")
 public class RedTopAuto extends LinearOpMode {
     private Drivetrain drivetrain;
@@ -21,8 +19,12 @@ public class RedTopAuto extends LinearOpMode {
         drivetrain.resetIMU();
 
         if (opModeIsActive()) {
-            drivetrain.strafeDistance(-6, .5);
-            sleep(500);
+            //drivetrain.driveForwardDistance(24, .5);
+            drivetrain.setFrontLeftPower(.8);
+            drivetrain.setFrontRightPower(.8);
+            drivetrain.setBackLeftPower(.8);
+            drivetrain.setBackRightPower(.8);
+            sleep(5000);
             //drivetrain.turnToAngle(20, .5);
             sleep(500);
             //TODO add shooter code
