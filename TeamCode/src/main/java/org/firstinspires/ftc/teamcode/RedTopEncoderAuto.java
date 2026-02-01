@@ -3,8 +3,8 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-@Autonomous(name = "Red Top Auto")
-public class RedTopAuto extends LinearOpMode {
+@Autonomous(name = "Red Top Encoder Auto")
+public class RedTopEncoderAuto extends LinearOpMode {
     private Drivetrain drivetrain;
 
     @Override
