@@ -11,12 +11,10 @@ public class RedMainOpMode extends LinearOpMode {
     public ShootIntake shootIntake;
     public AutoDrive autoDrive;
     public AprilTag aprilTag;
-    public boolean fieldOriented = false;
     public double axial, lateral, yaw;
     public double currentHeading = 0;
     public double currentAngularVelocity = 0;
     public double currentShooterVelocity = 0;
-    public double velocityTarget = 0;
     public double aprilTagBearing = 0;
     public double aprilTagEffectiveBearing = 0;
     public double aprilTagRange = 0;
@@ -65,8 +63,6 @@ public class RedMainOpMode extends LinearOpMode {
             yaw = gamepad1.right_stick_x;
 
 
-
-
             // Align and Shoot Button (Hold)
             if (gamepad1.a) {
                 // Run Launch Sequence and Set Shooter angle
@@ -92,7 +88,6 @@ public class RedMainOpMode extends LinearOpMode {
             drivetrain.drive(axial, lateral, yaw);
 
 
-
             // Intake Button (Hold)
             if (gamepad1.x) {
                 // Run Intake
@@ -102,6 +97,7 @@ public class RedMainOpMode extends LinearOpMode {
                 // Stop Intake
                 shootIntake.stopIntake();
             }
+
 
             // Launch Zone Set Buttons (Change to Gamepad 2) (Press)
             if (gamepad1.dpadLeftWasPressed()) {
@@ -117,12 +113,6 @@ public class RedMainOpMode extends LinearOpMode {
 
             //----Telemetry Updates----
             telemetry.addLine("Driver Data");
-            if (fieldOriented) {
-                telemetry.addLine("Field Oriented Drive On");
-            }
-            if (!fieldOriented) {
-                telemetry.addLine("Field Oriented Drive Off");
-            }
             telemetry.addData("Detection Valid", isAprilTagValid);
             telemetry.addData("Inputs", "axial: %.2f, lateral: %.2f, yaw: %.2f", axial, lateral, yaw);
             telemetry.addData("Heading", currentHeading);
