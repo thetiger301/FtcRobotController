@@ -64,6 +64,24 @@ public class AprilTag {
         }
     }
 
+    public void readBlueTag() {
+        AprilTagDetection targetTagBlue = null;
+        List<AprilTagDetection> detections = aprilTagProcessor.getDetections();
+        for (AprilTagDetection tag : detections) {
+            if (tag.id == 20) {
+                targetTagBlue = tag;
+                break;
+            }
+        }
+        if (targetTagBlue != null) {
+            lastBearing = targetTagBlue.ftcPose.bearing; //degrees
+            lastRange = targetTagBlue.ftcPose.range;
+            detectionRateUpdate(true);
+        } else {
+            detectionRateUpdate(false);
+        }
+    }
+
     public void detectionRateUpdate(boolean targetVisible) {
         double now = detectionTimer.seconds();
 

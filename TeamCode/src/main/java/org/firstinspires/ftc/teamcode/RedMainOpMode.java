@@ -3,8 +3,8 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-@TeleOp(name="Main OpMode")
-public class MainOpMode extends LinearOpMode {
+@TeleOp(name="Red Main OpMode")
+public class RedMainOpMode extends LinearOpMode {
 
     // System Declarations
     public Drivetrain drivetrain;
@@ -72,9 +72,8 @@ public class MainOpMode extends LinearOpMode {
                 // Run Launch Sequence and Set Shooter angle
                 if(!autoDrive.isReadyToShoot){
                     yaw = autoDrive.autoAlign(aprilTagEffectiveBearing, isAprilTagValid, yaw);
-                }
-                else{
-                    shootIntake.launchSequence();
+                } else {
+                    shootIntake.launchSequence(aprilTagRange);
                 }
             }
             else {
@@ -85,7 +84,7 @@ public class MainOpMode extends LinearOpMode {
 
             //sets important variable to true that will turn off as soon as shooter is up to velocity
             if (gamepad1.aWasPressed()) {
-                shootIntake.waitingForLaunch = true;
+                shootIntake.initiateLaunchSequence();
             }
 
 

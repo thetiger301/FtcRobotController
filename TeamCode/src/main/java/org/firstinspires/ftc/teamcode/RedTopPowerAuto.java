@@ -40,12 +40,10 @@ public class RedTopPowerAuto extends LinearOpMode{
             sleep(100);
 
              */
-            //TODO add camera alignment and shooter code
 
             shooterTimer.reset();
-            shootIntake.waitingForLaunch = true;
+            shootIntake.initiateLaunchSequence();
             while (shooterTimer.milliseconds() <= 5000){
-                //TODO change to blue tag
                 aprilTag.readRedTag();
                 // Run Launch Sequence and Set Shooter angle
                 if(!autoDrive.isReadyToShoot){
@@ -54,7 +52,7 @@ public class RedTopPowerAuto extends LinearOpMode{
                 }
                 else{
                     drivetrain.setYaw(0);
-                    shootIntake.launchSequence();
+                    shootIntake.launchSequence(aprilTag.getLastRange());
                 }
             }
             shootIntake.endLaunchSequence();
@@ -72,11 +70,11 @@ public class RedTopPowerAuto extends LinearOpMode{
             drivetrain.stopWheels();
             sleep(100);
             drivetrain.driveForward();
-            //TODO Intake on
+            shootIntake.runIntake();
             sleep(1250);
             drivetrain.stopWheels();
             sleep(100);
-            //TODO Intake off
+            shootIntake.stopIntake();
             drivetrain.driveBackward();
             sleep(1350);
             drivetrain.stopWheels();
@@ -91,8 +89,22 @@ public class RedTopPowerAuto extends LinearOpMode{
             sleep(100);
 
             */
-            //TODO add camera alignment and shooter code
-            sleep(2200);
+            shooterTimer.reset();
+            shootIntake.initiateLaunchSequence();
+            while (shooterTimer.milliseconds() <= 5000){
+                aprilTag.readRedTag();
+                // Run Launch Sequence and Set Shooter angle
+                if(!autoDrive.isReadyToShoot){
+                    double turnPower = autoDrive.autoAlign(aprilTag.getEffectiveBearing(), aprilTag.isValid(), 0);
+                    drivetrain.setYaw(turnPower);
+                }
+                else{
+                    drivetrain.setYaw(0);
+                    shootIntake.launchSequence(aprilTag.getLastRange());
+                }
+            }
+            shootIntake.endLaunchSequence();
+            autoDrive.resetAlignment();
             /*drivetrain.turnCounterClockwise();
             sleep(250);
             drivetrain.stopWheels();
@@ -105,11 +117,11 @@ public class RedTopPowerAuto extends LinearOpMode{
             drivetrain.stopWheels();
             sleep(100);
             drivetrain.driveForward();
-            //TODO Intake on
+            shootIntake.runIntake();
             sleep(1250);
             drivetrain.stopWheels();
             sleep(100);
-            //TODO Intake off
+            shootIntake.stopIntake();
             drivetrain.driveBackward();
             sleep(1350);
             drivetrain.stopWheels();
@@ -124,8 +136,22 @@ public class RedTopPowerAuto extends LinearOpMode{
             sleep(100);
 
              */
-            //TODO add camera alignment and shooter code
-            sleep(2200);
+            shooterTimer.reset();
+            shootIntake.initiateLaunchSequence();
+            while (shooterTimer.milliseconds() <= 5000){
+                aprilTag.readRedTag();
+                // Run Launch Sequence and Set Shooter angle
+                if(!autoDrive.isReadyToShoot){
+                    double turnPower = autoDrive.autoAlign(aprilTag.getEffectiveBearing(), aprilTag.isValid(), 0);
+                    drivetrain.setYaw(turnPower);
+                }
+                else{
+                    drivetrain.setYaw(0);
+                    shootIntake.launchSequence(aprilTag.getLastRange());
+                }
+            }
+            shootIntake.endLaunchSequence();
+            autoDrive.resetAlignment();
             /*drivetrain.turnCounterClockwise();
             sleep(250);
             drivetrain.stopWheels();
@@ -138,33 +164,13 @@ public class RedTopPowerAuto extends LinearOpMode{
             drivetrain.stopWheels();
             sleep(100);
             drivetrain.driveForward();
-            //TODO Intake on
+            shootIntake.runIntake();
             sleep(1250);
             drivetrain.stopWheels();
             sleep(100);
-            //TODO Intake off
-            drivetrain.driveBackward();
-            sleep(1350);
-            drivetrain.stopWheels();
-            sleep(100);
-            drivetrain.strafeRight(.7);
-            sleep(2400);
-            drivetrain.stopWheels();
-            sleep(100);
-            /*drivetrain.turnClockwise();
-            sleep(250);
-            drivetrain.stopWheels();
-            sleep(100);
+            shootIntake.stopIntake();
+            sleep(10000);
 
-             */
-            //TODO add camera alignment and shooter code
-            sleep(2200);
-            /*drivetrain.turnCounterClockwise();
-            sleep(250);
-            drivetrain.stopWheels();
-            sleep(100);
-
-             */
         }
     }
 }

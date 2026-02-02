@@ -55,7 +55,7 @@ public class AutoDrive {
                 if (!readyToShootTimerStarted) {
                     readyToShootTimerStarted = true;
                     readyToShootTimer.reset();
-                } else if (readyToShootTimer.seconds() >= 0.8) {
+                } else if (readyToShootTimer.seconds() >= 0.5) {
                     isReadyToShoot = true;
                     readyToShootTimerStarted = false;
                 }
@@ -106,6 +106,10 @@ public class AutoDrive {
         readyToShootTimerStarted = false;
     }
 
+    private double smooth(double target, double current, double alpha) {
+        return current + alpha * (target - current);
+    }
+
 
 
 
@@ -136,9 +140,6 @@ public class AutoDrive {
         TRACKING
     }
     public AlignmentStates alignState = AlignmentStates.ACQUIRING;
-    private double smooth(double target, double current, double alpha) {
-        return current + alpha * (target - current);
-    }
 
     public double angleError(double target, double current) {
         return AngleUnit.normalizeDegrees(target - current);

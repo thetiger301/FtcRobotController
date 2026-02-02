@@ -19,12 +19,13 @@ public class ShootIntake {
     // Launch Sequence Variables
     private ElapsedTime launchTimer = new ElapsedTime();
     private ElapsedTime loadingTimer = new ElapsedTime();
+    private boolean settingAngle = false;
+    public boolean waitingForLaunch = false;
     private boolean launching = false;
     private boolean resetingShot = false;
     private boolean loading = false;
     private double shooterVelocityErrorTolerance = 20;
     public double setVelocityTarget = 1500;
-    public boolean waitingForLaunch = false;
 
     // Launch Zone Variables
     private double[] launchZonePositions = {0, 0.5, 1};
@@ -96,9 +97,13 @@ public class ShootIntake {
     }
 
     // Launch Sequence Functions
-    public void launchSequence() {
+    public void launchSequence(double tagRange) {
 
         //TODO set Shooter angle and velocity
+        if (settingAngle) {
+            setShooterAngle(tagRange);
+            settingAngle = false;
+        }
 
         if (waitingForLaunch && Math.abs(getShooterVelocityError(setVelocityTarget)) <= shooterVelocityErrorTolerance) {
             shooterTrigger();
@@ -128,6 +133,11 @@ public class ShootIntake {
 
         double shooterPower = getShooterPower(setVelocityTarget, getShooterVelocity());
         setShooterPower(shooterPower);
+    }
+
+    public void initiateLaunchSequence() {
+        settingAngle = true;
+        waitingForLaunch = true;
     }
 
     public void endLaunchSequence() {
@@ -184,20 +194,21 @@ public class ShootIntake {
     }
 
     // Shooter Angle Set
-    public double setShooterAngle(boolean tagValid, double lastTagRange) {
-        double anglePosition;
-        double slope = 0;
-        double intercept = 0;
-        if (tagValid) {
-            if (lastTagRange >= 100) {
-                setShooterAnglePosition(0.4);
-                setVelocityTarget = 1500;
-            }
-            anglePosition = slope * lastTagRange + intercept;
+    public void setShooterAngle(double lastTagRange) {
+        double slope = -0.00666667;
+        double intercept = 0.733333;
+        double shooterAngle = 0;
+        if (lastTagRange >= 100) {
+            setVelocityTarget = 1500;
+            shooterAngle = 0.4;
+            setShooterAnglePosition(shooterAngle);
         } else {
-            anglePosition = launchZonePositions[launchZoneIndex];
+            setVelocityTarget = 1200;
+            shooterAngle = slope * lastTagRange + intercept;
+            shooterAngle = Math.ceil(shooterAngle * 100) /100;
+            shooterAngle = Range.clip(shooterAngle, 0, 1);
+            setShooterAnglePosition(shooterAngle);
         }
-        return anglePosition;
     }
 
     // Launch Zone Setters
