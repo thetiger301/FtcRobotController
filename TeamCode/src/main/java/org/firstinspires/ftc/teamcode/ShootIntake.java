@@ -19,12 +19,12 @@ public class ShootIntake {
     // Launch Sequence Variables
     private ElapsedTime launchTimer = new ElapsedTime();
     private ElapsedTime loadingTimer = new ElapsedTime();
-    private boolean waitingForLaunch = false;
     private boolean launching = false;
     private boolean resetingShot = false;
     private boolean loading = false;
     private double shooterVelocityErrorTolerance = 20;
-    public boolean launchSequenceRunning = false;
+    public double setVelocityTarget = 1500;
+    public boolean waitingForLaunch = false;
 
     // Launch Zone Variables
     private double[] launchZonePositions = {0, 0.5, 1};
@@ -35,7 +35,6 @@ public class ShootIntake {
     public boolean intaking = false;
 
     // Shooter PID Variables
-    private double lastVelocity = 0;
     public double velocityError = 0;
     private double commandedVelocity = 0;
     private double feedFoward = 0;
@@ -97,8 +96,11 @@ public class ShootIntake {
     }
 
     // Launch Sequence Functions
-    public void launchSequence(double shooterVelocityError) {
-        if (waitingForLaunch && Math.abs(shooterVelocityError) <= shooterVelocityErrorTolerance) {
+    public void launchSequence() {
+
+        //TODO set Shooter angle and velocity
+
+        if (waitingForLaunch && Math.abs(getShooterVelocityError(setVelocityTarget)) <= shooterVelocityErrorTolerance) {
             shooterTrigger();
             launchTimer.reset();
             waitingForLaunch = false;
@@ -123,12 +125,14 @@ public class ShootIntake {
             waitingForLaunch = true;
             loading = false;
         }
+
+        double shooterPower = getShooterPower(setVelocityTarget, getShooterVelocity());
+        setShooterPower(shooterPower);
     }
 
-    public void initiateLaunchSequence() {
-        setShooterAnglePosition(launchZonePositions[launchZoneIndex]);
-        waitingForLaunch = true;
-    }
+
+
+
 
     public void endLaunchSequence() {
         if (launching) {
@@ -142,6 +146,8 @@ public class ShootIntake {
             stopIntake();
             loading = false;
         }
+        setShooterPower(0);
+        resetShooterPID();
     }
 
     // Shooter PID
@@ -177,8 +183,25 @@ public class ShootIntake {
     }
 
     public void resetShooterPID() {
-        lastVelocity = 0.0;
-        commandedVelocity = 0.0;
+        commandedVelocity = 0;
+        shooterPIDTimer.reset();
+    }
+
+    // Shooter Angle Set
+    public double setShooterAngle(boolean tagValid, double lastTagRange) {
+        double anglePosition;
+        double slope = 0;
+        double intercept = 0;
+        if (tagValid) {
+            if (lastTagRange >= 100) {
+                setShooterAnglePosition(0.4);
+                setVelocityTarget = 1500;
+            }
+            anglePosition = slope * lastTagRange + intercept;
+        } else {
+            anglePosition = launchZonePositions[launchZoneIndex];
+        }
+        return anglePosition;
     }
 
     // Launch Zone Setters

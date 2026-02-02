@@ -9,21 +9,27 @@ public class MainOpMode extends LinearOpMode {
     // System Declarations
     public Drivetrain drivetrain;
     public ShootIntake shootIntake;
-    public AutoDriveShoot autoDriveShoot;
+    public AutoDrive autoDrive;
     public AprilTag aprilTag;
-    public boolean fieldOriented = true;
+    public boolean fieldOriented = false;
     public double axial, lateral, yaw;
-    public double shooterPower = 0;
+    public double currentHeading = 0;
+    public double currentAngularVelocity = 0;
     public double currentShooterVelocity = 0;
-    public double shooterVelocityError = 0;
     public double velocityTarget = 0;
+    public double aprilTagBearing = 0;
+    public double aprilTagEffectiveBearing = 0;
+    public double aprilTagRange = 0;
+    public boolean isAprilTagValid = false;
+    public double aprilTagConfidence = 0;
+    public double aprilTagDetectionRate = 0;
 
     @Override
     public void runOpMode() {
         drivetrain = new Drivetrain(hardwareMap, telemetry);
         shootIntake = new ShootIntake(hardwareMap);
         aprilTag = new AprilTag(hardwareMap);
-        autoDriveShoot = new AutoDriveShoot();
+        autoDrive = new AutoDrive();
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -39,102 +45,97 @@ public class MainOpMode extends LinearOpMode {
             telemetry.addData("Status", "Running");
 
             //----Sensor Updates----
-            currentShooterVelocity = shootIntake.getShooterVelocity();
+            //TODO ADD BLUE TEAM OR RED TEAM SWITCHER IF STATEMENT
             aprilTag.readRedTag();
+            aprilTagBearing = aprilTag.getLastBearing();
+            aprilTagEffectiveBearing = aprilTag.getEffectiveBearing();
+            aprilTagRange = aprilTag.getLastRange();
+            isAprilTagValid = aprilTag.isValid();
+            aprilTagDetectionRate = aprilTag.getDetectionRate();
+            aprilTagConfidence = aprilTag.getConfidence();
+            currentShooterVelocity = shootIntake.getShooterVelocity();
+            currentHeading = drivetrain.getHeading();
+            currentAngularVelocity = drivetrain.getAngularVelocity();
 
-            //----Gamepad Updates----
+            //----Main Program----
 
             //Drivetrain control
             axial = -gamepad1.left_stick_y;
             lateral = gamepad1.left_stick_x;
             yaw = gamepad1.right_stick_x;
 
-            // Field oriented drive toggle
-            if (gamepad1.dpadDownWasPressed()){
-                fieldOriented = !fieldOriented;
-            }
 
-            // Shoot Button (Hold)
+
+
+            // Align and Shoot Button (Hold)
             if (gamepad1.a) {
-                shootIntake.launchSequenceRunning = true;
-            } else {
-                shootIntake.launchSequenceRunning = false;
+                // Run Launch Sequence and Set Shooter angle
+                if(!autoDrive.isReadyToShoot){
+                    yaw = autoDrive.autoAlign(aprilTagEffectiveBearing, isAprilTagValid, yaw);
+                }
+                else{
+                    shootIntake.launchSequence();
+                }
             }
-            if (gamepad1.aWasPressed()) {
-                shootIntake.initiateLaunchSequence();
-            }
-
-            // Launch Zone Set Buttons (Press)
-            if (gamepad2.xWasPressed()) {
-                shootIntake.setCloseLaunchZone();
-            }
-            if (gamepad2.yWasPressed()) {
-                shootIntake.setMidLaunchZone();
-            }
-            if (gamepad2.bWasPressed()) {
-                shootIntake.setFarLaunchZone();
-            }
-
-            // Intake Button (Hold)
-            if (gamepad1.x) {
-                shootIntake.intaking = true;
-            }
-            if (gamepad1.xWasReleased()) {
-                shootIntake.intaking = false;
-                shootIntake.stopIntake();
-            }
-
-            // Auto Align Button (Hold)
-            if (gamepad1.right_bumper) {
-                autoDriveShoot.autoAlignEnabled = true;
-            } else {
-                autoDriveShoot.autoAlignEnabled = false;
-            }
-
-            //----Launch Sequence Logic----
-            if (shootIntake.launchSequenceRunning) {
-                velocityTarget = 1000;
-                shooterVelocityError = shootIntake.getShooterVelocityError(velocityTarget);
-                shootIntake.launchSequence(shooterVelocityError);
-            } else {
-                velocityTarget = 0;
+            else {
+                // ends and resets alignment and shooter
+                autoDrive.resetAlignment();
                 shootIntake.endLaunchSequence();
             }
 
-            //----Motor and Servo Updates----
-
-            // Run drivetrain
-            if (fieldOriented) { // Defaults to fieldOriented true
-                drivetrain.fieldOrientedDrive(axial, lateral, yaw);
-                telemetry.addData("Field Oriented Enabled", true);
-            } else if (!fieldOriented) {
-                drivetrain.drive(axial, lateral, yaw);
-                telemetry.addData("Field Oriented Enabled", false);
+            //sets important variable to true that will turn off as soon as shooter is up to velocity
+            if (gamepad1.aWasPressed()) {
+                shootIntake.waitingForLaunch = true;
             }
 
-            // Run Shooter
-            if (shootIntake.launchSequenceRunning) {
-                shooterPower = shootIntake.getShooterPower(velocityTarget, currentShooterVelocity);
-            } else {
-                shooterPower = 0;
-                shootIntake.resetShooterPID();
-            }
-            shootIntake.setShooterPower(shooterPower);
 
-            // Run Intake
-            if (shootIntake.intaking) {
+            //set drivetrain motors to robot oriented
+            drivetrain.drive(axial, lateral, yaw);
+
+
+
+            // Intake Button (Hold)
+            if (gamepad1.x) {
+                // Run Intake
                 shootIntake.runIntake();
             }
+            if (gamepad1.xWasReleased()) {
+                // Stop Intake
+                shootIntake.stopIntake();
+            }
+
+            // Launch Zone Set Buttons (Change to Gamepad 2) (Press)
+            if (gamepad1.dpadLeftWasPressed()) {
+                shootIntake.setCloseLaunchZone();
+            }
+            if (gamepad1.dpadUpWasPressed()) {
+                shootIntake.setMidLaunchZone();
+            }
+            if (gamepad1.dpadRightWasPressed()) {
+                shootIntake.setFarLaunchZone();
+            }
+
 
             //----Telemetry Updates----
+            telemetry.addLine("Driver Data");
+            if (fieldOriented) {
+                telemetry.addLine("Field Oriented Drive On");
+            }
+            if (!fieldOriented) {
+                telemetry.addLine("Field Oriented Drive Off");
+            }
+            telemetry.addData("Detection Valid", isAprilTagValid);
             telemetry.addData("Inputs", "axial: %.2f, lateral: %.2f, yaw: %.2f", axial, lateral, yaw);
-            telemetry.addData("Heading", drivetrain.getHeading());
-            telemetry.addData("Shooter Current Velocity", currentShooterVelocity);
-            telemetry.addData(" Shooter Velocity Error", shooterVelocityError);
+            telemetry.addData("Heading", currentHeading);
             telemetry.addLine(shootIntake.getCurrentLaunchZone());
-            telemetry.addData("Detection Rate", aprilTag.getDetectionRate());
-            telemetry.addData("Detection Confidence", aprilTag.getConfidence());
-            telemetry.addData("Detection Valid", aprilTag.isValid());
+            telemetry.addData("Shooter Current Velocity", currentShooterVelocity);
+            telemetry.addLine();
+            telemetry.addLine("Camera Data");
+            telemetry.addData("Bearing", aprilTagBearing);
+            telemetry.addData("Range", aprilTagRange);
+            telemetry.addData("Effective Bearing", aprilTag.getEffectiveBearing());
+            telemetry.addData("Detection Rate", aprilTagDetectionRate);
+            telemetry.addData("Detection Confidence", aprilTagConfidence);
             telemetry.update();
         }
     }

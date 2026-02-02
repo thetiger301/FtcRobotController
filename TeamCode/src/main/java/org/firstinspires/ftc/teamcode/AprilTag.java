@@ -22,7 +22,6 @@ public class AprilTag {
     private VisionPortal visionPortal;
     private double lastBearing = 0;
     private double lastRange = 0;
-    private boolean tagVisible = false;
     private double confidence = 0;
 
     // Sliding Window Detection Time Stamps
@@ -100,7 +99,12 @@ public class AprilTag {
     public double getEffectiveBearing() {
         return lastBearing * getConfidence();
     }
-
+    public double getLastBearing() {
+        return lastBearing;
+    }
+    public double getLastRange() {
+        return lastRange;
+    }
     public boolean isValid() {
         return getConfidence() > 0.05;
     }

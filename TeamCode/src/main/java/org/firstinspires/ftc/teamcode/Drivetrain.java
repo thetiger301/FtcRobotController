@@ -44,6 +44,10 @@ public class Drivetrain {
         return imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
     }
 
+    public double getAngularVelocity() {
+        return imu.getRobotAngularVelocity(AngleUnit.DEGREES).zRotationRate;
+    }
+
     public void drive(double axial, double lateral, double yaw) {
         double max;
 
@@ -69,11 +73,6 @@ public class Drivetrain {
         frontRight.setPower(frontRightPower);
         backLeft.setPower(backLeftPower);
         backRight.setPower(backRightPower);
-
-
-
-        telemetry.addData("Front left/Right", "%4.2f, %4.2f", frontLeftPower, frontRightPower);
-        telemetry.addData("Back  left/Right", "%4.2f, %4.2f", backLeftPower, backRightPower);
     }
 
     public void fieldOrientedDrive(double axial, double lateral, double yaw) {
@@ -107,11 +106,6 @@ public class Drivetrain {
         frontRight.setPower(frontRightPower);
         backLeft.setPower(backLeftPower);
         backRight.setPower(backRightPower);
-
-
-
-        telemetry.addData("Front left/Right", "%4.2f, %4.2f", frontLeftPower, frontRightPower);
-        telemetry.addData("Back  left/Right", "%4.2f, %4.2f", backLeftPower, backRightPower);
     }
 
     // reset heading
