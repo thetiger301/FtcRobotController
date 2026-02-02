@@ -130,10 +130,6 @@ public class ShootIntake {
         setShooterPower(shooterPower);
     }
 
-
-
-
-
     public void endLaunchSequence() {
         if (launching) {
             shooterTriggerReset();

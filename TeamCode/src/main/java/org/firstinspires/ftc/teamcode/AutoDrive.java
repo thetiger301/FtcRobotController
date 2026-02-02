@@ -8,6 +8,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 public class AutoDrive {
     public boolean autoAlignEnabled = false;
     public boolean isReadyToShoot = false;
+    private ElapsedTime readyToShootTimer = new ElapsedTime();
+    private boolean readyToShootTimerStarted = false;
     private double turnCmd = 0;
     private double lastTurnCmd = 0;
 
@@ -50,7 +52,13 @@ public class AutoDrive {
         } else {
 
             if (Math.abs(error) <= SHOOTER_TOLERANCE_DEG) {
-                isReadyToShoot = true;
+                if (!readyToShootTimerStarted) {
+                    readyToShootTimerStarted = true;
+                    readyToShootTimer.reset();
+                } else if (readyToShootTimer.seconds() >= 0.8) {
+                    isReadyToShoot = true;
+                    readyToShootTimerStarted = false;
+                }
             }
 
 
@@ -95,6 +103,7 @@ public class AutoDrive {
     public void resetAlignment() {
         resetAlignmentController();
         isReadyToShoot = false;
+        readyToShootTimerStarted = false;
     }
 
 

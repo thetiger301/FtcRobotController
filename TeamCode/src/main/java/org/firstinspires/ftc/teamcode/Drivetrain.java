@@ -108,6 +108,61 @@ public class Drivetrain {
         backRight.setPower(backRightPower);
     }
 
+    public void driveForward(){
+        double power = 0.45;
+        frontLeft.setPower(power);
+        frontRight.setPower(power);
+        backLeft.setPower(power);
+        backRight.setPower(power);
+    }
+    public void driveBackward(){
+        double power = 0.45;
+        frontLeft.setPower(-power);
+        frontRight.setPower(-power);
+        backLeft.setPower(-power);
+        backRight.setPower(-power);
+    }
+    public void strafeRight(double power){
+        frontLeft.setPower(power);
+        frontRight.setPower(-power);
+        backLeft.setPower(-power);
+        backRight.setPower(power);
+    }
+    public void strafeLeft(double power){
+        frontLeft.setPower(-power);
+        frontRight.setPower(power);
+        backLeft.setPower(power);
+        backRight.setPower(-power);
+    }
+    public void turnClockwise(){
+        double power = 0.2;
+        frontLeft.setPower(power);
+        frontRight.setPower(-power);
+        backLeft.setPower(power);
+        backRight.setPower(-power);
+    }
+    public void turnCounterClockwise(){
+        double power = 0.2;
+        frontLeft.setPower(-power);
+        frontRight.setPower(power);
+        backLeft.setPower(-power);
+        backRight.setPower(power);
+    }
+    public void stopWheels(){
+        frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        frontLeft.setPower(0);
+        frontRight.setPower(0);
+        backLeft.setPower(0);
+        backRight.setPower(0);
+    }
+
+    public void setYaw(double yaw){
+        drive(0, 0, yaw);
+    }
+
     // reset heading
     public void resetIMU() {
         imu.resetYaw();
