@@ -19,7 +19,7 @@ public class RedAutoDrive {
     private static final double ALIGN_TURN_MAX_POWER = 0.3;
     private static final double ALIGN_TURN_MIN_POWER = 0.07;
     private static final double K_CAM = 0.05;
-    private static final double CAM_OFFSET = -6;
+    private static final double CAM_OFFSET = 0;
 
     // Camera Only Alignment Controller Constants
     private double kP = 0.03;

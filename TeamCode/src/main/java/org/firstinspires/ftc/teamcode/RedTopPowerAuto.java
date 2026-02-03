@@ -66,21 +66,21 @@ public class RedTopPowerAuto extends LinearOpMode{
              */
             //begin first progression
             drivetrain.strafeLeft(.5);
-            sleep(900);
+            sleep(960);
             drivetrain.stopWheels();
             sleep(100);
             drivetrain.driveForward();
             shootIntake.runIntake();
-            sleep(1250);
+            sleep(1450);
             drivetrain.stopWheels();
             sleep(100);
             shootIntake.stopIntake();
             drivetrain.driveBackward();
-            sleep(1350);
+            sleep(1500);
             drivetrain.stopWheels();
             sleep(100);
             drivetrain.strafeRight(.5);
-            sleep(900);
+            sleep(980);
             drivetrain.stopWheels();
             sleep(100);
             /*drivetrain.turnClockwise();
@@ -113,21 +113,21 @@ public class RedTopPowerAuto extends LinearOpMode{
              */
             //begin second progression
             drivetrain.strafeLeft(.6);
-            sleep(1800);
+            sleep(1890);
             drivetrain.stopWheels();
             sleep(100);
             drivetrain.driveForward();
             shootIntake.runIntake();
-            sleep(1250);
+            sleep(1450);
             drivetrain.stopWheels();
             sleep(100);
             shootIntake.stopIntake();
             drivetrain.driveBackward();
-            sleep(1350);
+            sleep(1500);
             drivetrain.stopWheels();
             sleep(100);
             drivetrain.strafeRight(.6);
-            sleep(1800);
+            sleep(1890);
             drivetrain.stopWheels();
             sleep(100);
             /*drivetrain.turnClockwise();
@@ -159,7 +159,7 @@ public class RedTopPowerAuto extends LinearOpMode{
 
              */
             //Begin third progression
-            drivetrain.strafeLeft(.7);
+            drivetrain.strafeLeft(.6);
             sleep(2400);
             drivetrain.stopWheels();
             sleep(100);
