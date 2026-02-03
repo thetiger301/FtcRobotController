@@ -58,20 +58,20 @@ public class BlueTopPowerAuto extends LinearOpMode{
             shootIntake.endLaunchSequence();
             autoDrive.resetAlignment();
 
-            /*drivetrain.turnClockwise();
-            sleep(250);
+            drivetrain.turnClockwise();
+            sleep(200);
             drivetrain.stopWheels();
             sleep(100);
 
-             */
+
             //begin first progression
             drivetrain.strafeRight(.5);
-            sleep(900);
+            sleep(960);
             drivetrain.stopWheels();
             sleep(100);
             drivetrain.driveForward();
             shootIntake.runIntake();
-            sleep(1550);
+            sleep(1450);
             drivetrain.stopWheels();
             sleep(100);
             shootIntake.stopIntake();
@@ -80,7 +80,7 @@ public class BlueTopPowerAuto extends LinearOpMode{
             drivetrain.stopWheels();
             sleep(100);
             drivetrain.strafeLeft(.5);
-            sleep(900);
+            sleep(980);
             drivetrain.stopWheels();
             sleep(100);
             /*drivetrain.turnCounterClockwise();
@@ -105,15 +105,15 @@ public class BlueTopPowerAuto extends LinearOpMode{
             }
             shootIntake.endLaunchSequence();
             autoDrive.resetAlignment();
-            /*drivetrain.turnClockwise();
-            sleep(250);
+            drivetrain.turnClockwise();
+            sleep(200);
             drivetrain.stopWheels();
             sleep(100);
 
-             */
+
             //begin second progression
             drivetrain.strafeRight(.6);
-            sleep(1800);
+            sleep(1890);
             drivetrain.stopWheels();
             sleep(100);
             drivetrain.driveForward();
@@ -127,7 +127,7 @@ public class BlueTopPowerAuto extends LinearOpMode{
             drivetrain.stopWheels();
             sleep(100);
             drivetrain.strafeLeft(.6);
-            sleep(1800);
+            sleep(1890);
             drivetrain.stopWheels();
             sleep(100);
             /*drivetrain.turnCounterClockwise();
@@ -152,12 +152,12 @@ public class BlueTopPowerAuto extends LinearOpMode{
             }
             shootIntake.endLaunchSequence();
             autoDrive.resetAlignment();
-            /*drivetrain.turnClockwise();
-            sleep(250);
+            drivetrain.turnClockwise();
+            sleep(200);
             drivetrain.stopWheels();
             sleep(100);
 
-             */
+
             //Begin third progression
             drivetrain.strafeRight(.6);
             sleep(2400);
