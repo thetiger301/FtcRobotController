@@ -75,6 +75,10 @@ public class ShootIntake {
         setShooterFeederPower(1);
     }
 
+    public void runOuttake() {
+        intake.setPower(-1);
+        setShooterFeederPower(-1);
+    }
     public void stopIntake() {
         intake.setPower(0);
         setShooterFeederPower(0);
@@ -199,8 +203,8 @@ public class ShootIntake {
         double intercept = 0.733333;
         double shooterAngle = 0;
         if (lastTagRange >= 100) {
-            setVelocityTarget = 1500;
-            shooterAngle = 0.4;
+            setVelocityTarget = 1550;
+            shooterAngle = 0.45;
             setShooterAnglePosition(shooterAngle);
         } else {
             setVelocityTarget = 1200;

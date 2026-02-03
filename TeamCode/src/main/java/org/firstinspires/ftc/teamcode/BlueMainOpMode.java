@@ -9,7 +9,7 @@ public class BlueMainOpMode extends LinearOpMode {
     // System Declarations
     public Drivetrain drivetrain;
     public ShootIntake shootIntake;
-    public AutoDrive autoDrive;
+    public BlueAutoDrive autoDrive;
     public AprilTag aprilTag;
     public boolean fieldOriented = false;
     public double axial, lateral, yaw;
@@ -29,7 +29,7 @@ public class BlueMainOpMode extends LinearOpMode {
         drivetrain = new Drivetrain(hardwareMap, telemetry);
         shootIntake = new ShootIntake(hardwareMap);
         aprilTag = new AprilTag(hardwareMap);
-        autoDrive = new AutoDrive();
+        autoDrive = new BlueAutoDrive();
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -58,13 +58,17 @@ public class BlueMainOpMode extends LinearOpMode {
 
             //----Main Program----
 
-            //Drivetrain control
+            // Drivetrain control
             axial = -gamepad1.left_stick_y;
             lateral = gamepad1.left_stick_x;
             yaw = gamepad1.right_stick_x;
 
-
-
+            // Slow Down DriveTrain Button (Hold)
+            if (gamepad1.right_bumper) {
+                axial = axial * 0.3;
+                lateral = lateral * 0.3;
+                yaw = yaw * 0.3;
+            }
 
             // Align and Shoot Button (Hold)
             if (gamepad1.a) {
@@ -98,6 +102,16 @@ public class BlueMainOpMode extends LinearOpMode {
                 shootIntake.runIntake();
             }
             if (gamepad1.xWasReleased()) {
+                // Stop Intake
+                shootIntake.stopIntake();
+            }
+
+            // Outtake Button (Hold)
+            if (gamepad1.b) {
+                // Outtake
+                shootIntake.runOuttake();
+            }
+            if (gamepad1.bWasReleased()) {
                 // Stop Intake
                 shootIntake.stopIntake();
             }

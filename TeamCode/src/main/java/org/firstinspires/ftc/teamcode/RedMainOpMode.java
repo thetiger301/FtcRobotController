@@ -9,7 +9,7 @@ public class RedMainOpMode extends LinearOpMode {
     // System Declarations
     public Drivetrain drivetrain;
     public ShootIntake shootIntake;
-    public AutoDrive autoDrive;
+    public RedAutoDrive autoDrive;
     public AprilTag aprilTag;
     public double axial, lateral, yaw;
     public double currentHeading = 0;
@@ -27,7 +27,7 @@ public class RedMainOpMode extends LinearOpMode {
         drivetrain = new Drivetrain(hardwareMap, telemetry);
         shootIntake = new ShootIntake(hardwareMap);
         aprilTag = new AprilTag(hardwareMap);
-        autoDrive = new AutoDrive();
+        autoDrive = new RedAutoDrive();
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();

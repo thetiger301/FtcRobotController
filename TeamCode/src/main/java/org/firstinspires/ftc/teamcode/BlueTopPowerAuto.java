@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class BlueTopPowerAuto extends LinearOpMode{
 
     private Drivetrain drivetrain;
-    private AutoDrive autoDrive;
+    private BlueAutoDrive autoDrive;
     private ShootIntake shootIntake;
     private AprilTag aprilTag;
     private ElapsedTime shooterTimer = new ElapsedTime();
@@ -17,7 +17,7 @@ public class BlueTopPowerAuto extends LinearOpMode{
     @Override
     public void runOpMode() {
         drivetrain = new Drivetrain(hardwareMap, telemetry);
-        autoDrive = new AutoDrive();
+        autoDrive = new BlueAutoDrive();
         shootIntake = new ShootIntake(hardwareMap);
         aprilTag = new AprilTag(hardwareMap);
 
@@ -43,7 +43,7 @@ public class BlueTopPowerAuto extends LinearOpMode{
              */
             shooterTimer.reset();
             shootIntake.initiateLaunchSequence();
-            while (shooterTimer.milliseconds() <= 2200){
+            while (shooterTimer.milliseconds() <= 5000){
                 aprilTag.readBlueTag();
                 // Run Launch Sequence and Set Shooter angle
                 if(!autoDrive.isReadyToShoot){
@@ -91,7 +91,7 @@ public class BlueTopPowerAuto extends LinearOpMode{
             */
             shooterTimer.reset();
             shootIntake.initiateLaunchSequence();
-            while (shooterTimer.milliseconds() <= 2200){
+            while (shooterTimer.milliseconds() <= 5000){
                 aprilTag.readBlueTag();
                 // Run Launch Sequence and Set Shooter angle
                 if(!autoDrive.isReadyToShoot){
@@ -138,7 +138,7 @@ public class BlueTopPowerAuto extends LinearOpMode{
              */
             shooterTimer.reset();
             shootIntake.initiateLaunchSequence();
-            while (shooterTimer.milliseconds() <= 2200){
+            while (shooterTimer.milliseconds() <= 5000){
                 aprilTag.readBlueTag();
                 // Run Launch Sequence and Set Shooter angle
                 if(!autoDrive.isReadyToShoot){

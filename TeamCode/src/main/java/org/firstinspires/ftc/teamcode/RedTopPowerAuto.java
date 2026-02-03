@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class RedTopPowerAuto extends LinearOpMode{
 
     private Drivetrain drivetrain;
-    private AutoDrive autoDrive;
+    private RedAutoDrive autoDrive;
     private ShootIntake shootIntake;
     private AprilTag aprilTag;
     private ElapsedTime shooterTimer = new ElapsedTime();
@@ -17,7 +17,7 @@ public class RedTopPowerAuto extends LinearOpMode{
     @Override
     public void runOpMode() {
         drivetrain = new Drivetrain(hardwareMap, telemetry);
-        autoDrive = new AutoDrive();
+        autoDrive = new RedAutoDrive();
         shootIntake = new ShootIntake(hardwareMap);
         aprilTag = new AprilTag(hardwareMap);
 
